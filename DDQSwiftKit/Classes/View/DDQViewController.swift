@@ -11,7 +11,7 @@ import UIKit
  统一一些写法和参数
  */
 open class DDQViewController: UIViewController {
-    enum DDQViewControllerTableStyle: Int {
+    public enum DDQViewControllerTableStyle: Int {
         
         case none
         case grouped
@@ -21,9 +21,9 @@ open class DDQViewController: UIViewController {
     
     /// 默认自带的tableView。
     /// ddqTableViewStyle返回值不为none时有值
-    var tableView: UITableView?
+    public var tableView: UITableView?
     
-    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+    public override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         self.ddqControllerInitialize()
@@ -54,7 +54,7 @@ open class DDQViewController: UIViewController {
         }
     }
     
-    func ddqTableViewStyle() -> DDQViewControllerTableStyle {
+    open func ddqTableViewStyle() -> DDQViewControllerTableStyle {
         .none
     }
         

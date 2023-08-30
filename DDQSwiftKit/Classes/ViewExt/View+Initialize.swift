@@ -54,6 +54,7 @@ public extension UILabel {
         
         let label = ddqLabel()
         let attributedText = NSAttributedString.init(string: text, attributes: attributes ?? ddqAttributes())
+        label.attributedText = attributedText
         return label
     }
 }
@@ -168,7 +169,7 @@ public extension UIImageView {
         return imageView
     }
     
-    class func ddqImageView(gift images: [Any]?) -> UIImageView {
+    class func ddqImageView(gif images: [Any]?) -> UIImageView {
         
         let imageView = ddqImageView()
         
@@ -235,9 +236,9 @@ public extension UITableView {
     class func ddqTableView(style: Style = .grouped, delegate: UITableViewDelegate? = nil, dataSource: UITableViewDataSource? = nil) -> UITableView {
         
         let tableView = UITableView.init(frame: CGRect.zero, style: style)
-        tableView.estimatedRowHeight = 0.0
-        tableView.estimatedSectionHeaderHeight = 0.0
-        tableView.estimatedSectionFooterHeight = 0.0
+        tableView.sectionHeaderHeight = 0
+        tableView.sectionFooterHeight = 0.0
+        tableView.rowHeight = 0.0
         tableView.contentInset = .zero
         tableView.showsVerticalScrollIndicator = false
         tableView.showsHorizontalScrollIndicator = false

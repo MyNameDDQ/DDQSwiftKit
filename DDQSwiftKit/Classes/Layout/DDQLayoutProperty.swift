@@ -8,7 +8,7 @@
 import UIKit
 
 public struct DDQLayoutProperty {
-    enum DDQLayoutAligment: Int {
+    public enum DDQLayoutAligment: Int {
         
         case left
         case right
@@ -19,10 +19,10 @@ public struct DDQLayoutProperty {
         case center
     }
     
-    var aligment: DDQLayoutAligment = .left
-    var layoutView: UIView?
+    public let aligment: DDQLayoutAligment
+    public let layoutView: UIView
     
-    init(view: UIView, aligment: DDQLayoutAligment) {
+    public init(view: UIView, aligment: DDQLayoutAligment) {
         
         self.layoutView = view
         self.aligment = aligment

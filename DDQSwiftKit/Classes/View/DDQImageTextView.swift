@@ -64,22 +64,22 @@ open class DDQImageTextLayoutView: DDQBasalLayoutView {
             case .TImageBText:
                 main = self.imageView
                 sub = self.titleLabel
-                self.direction = .upperAndLower
+                self.direction = .vertical
 
             case .LImageRText:
                 main = self.imageView
                 sub = self.titleLabel
-                self.direction = .leftAndRight
+                self.direction = .horizontal
 
             case .LTextRImage:
                 main = self.titleLabel
                 sub = self.imageView
-                self.direction = .leftAndRight
+                self.direction = .horizontal
 
             default:
                 main = self.titleLabel
                 sub = self.imageView
-                self.direction = .upperAndLower
+                self.direction = .vertical
         }
         
         self.mainView = main

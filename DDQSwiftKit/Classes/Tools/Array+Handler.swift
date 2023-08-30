@@ -9,7 +9,7 @@ import Foundation
 
 public extension Array where Element: Equatable {
     func ddqIsBeyond(index: Int) -> Bool {
-        if isEmpty {
+        if isEmpty || index < 0 {
             return true
         }
         

@@ -301,7 +301,7 @@ public extension UIImageView {
         self.image = image
     }
     
-    func ddqSetWebImage(url: String?, placeholder: UIImage? = nil, placeholderName: String? = nil, completed: SDExternalCompletionBlock? = nil) {
+    func ddqSetWebImage(url: String, placeholder: UIImage? = nil, placeholderName: String? = nil, completed: SDExternalCompletionBlock? = nil) {
         
         var image = placeholder
         
@@ -309,7 +309,7 @@ public extension UIImageView {
             image = .ddqImage(imageName: placeholderName)
         }
         
-        self.sd_setImage(with: URL(string: url ?? ""), placeholderImage: placeholder, completed: completed)
+        self.sd_setImage(with: URL(string: url), placeholderImage: image, completed: completed)
     }
 }
 

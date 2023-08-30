@@ -9,8 +9,13 @@ import UIKit
 
 public struct DDQCellSeparatorMargin {
     
-    var left: CGFloat
-    var right: CGFloat
+    public var left: CGFloat
+    public var right: CGFloat
+    
+    public init(left: CGFloat, right: CGFloat) {
+        self.left = left
+        self.right = right
+    }
 }
 
 public extension DDQCellSeparatorMargin {
@@ -91,7 +96,7 @@ open class DDQCell: UITableViewCell {
     
     open func ddqCellDidUpdateData() {}
         
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+    public override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         self.ddqCellInitialize()

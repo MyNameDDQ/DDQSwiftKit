@@ -33,7 +33,7 @@ open class DDQView: UIView {
         }
     }
             
-    override init(frame: CGRect) {
+    public override init(frame: CGRect) {
         
         super.init(frame: frame)
         self.ddqViewInitialize()
@@ -57,7 +57,7 @@ open class DDQView: UIView {
             
     open override var frame: CGRect {
         didSet {
-            if self.self.ddqLayoutSubviewsWhenSetFrame() {
+            if self.ddqLayoutSubviewsWhenSetFrame() {
                 self.ddqLayoutSubviews(size: frame.size)
             }
         }

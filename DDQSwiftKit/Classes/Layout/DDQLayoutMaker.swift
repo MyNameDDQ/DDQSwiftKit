@@ -9,8 +9,13 @@ import UIKit
 
 public struct DDQLayoutCenterOffset {
     
-    var xOffset: CGFloat
-    var yOffset: CGFloat
+    public var xOffset: CGFloat
+    public var yOffset: CGFloat
+    
+    public init(xOffset: CGFloat, yOffset: CGFloat) {
+        self.xOffset = xOffset
+        self.yOffset = yOffset
+    }
 }
 
 public extension DDQLayoutCenterOffset {
@@ -100,10 +105,14 @@ open class DDQLayoutMake {
         self._handleInstallSize(size: size)
     }
     
+    open func ddqSize(size: CGSize, scale: CGFloat) {
+        ddqSize(size: CGSize(width: size.width * scale, height: size.height * scale))
+    }
+    
     open func ddqSizeToFit() {
         
         self.view?.sizeToFit()
-        self.ddqSize(size: self.view?.ddqSize ?? .zero)
+        ddqSize(size: self.view?.ddqSize ?? .zero)
     }
 
     open func ddqSizeThatFits(size: CGSize) {
@@ -178,13 +187,11 @@ open class DDQLayoutMake {
                 self.horDirection = .center
                 self.verDirection = .center
                 
-                if let layoutView = property.layoutView {
-                    
-                    let isSuper = self.view?.superview == layoutView
-                    let x = isSuper ? layoutView.ddqBoundsMidX : layoutView.ddqMidX
-                    let y = isSuper ? layoutView.ddqBoundsMidY : layoutView.ddqMidY
-                    frame.origin = CGPoint(x: x + offset.xOffset, y: y + offset.yOffset)
-                }
+                let layoutView = property.layoutView
+                let isSuper = self.view?.superview == layoutView
+                let x = isSuper ? layoutView.ddqBoundsMidX : layoutView.ddqMidX
+                let y = isSuper ? layoutView.ddqBoundsMidY : layoutView.ddqMidY
+                frame.origin = CGPoint(x: x + offset.xOffset, y: y + offset.yOffset)
         }
         
         self.origin = frame.origin
@@ -196,12 +203,8 @@ open class DDQLayoutMake {
             return 0.0
         }
         
-        guard property!.layoutView != nil else {
-            return 0.0
-        }
-        
         var value: CGFloat = 0.0
-        let layoutView = property!.layoutView!
+        let layoutView = property!.layoutView
         let isSuper = layoutView == self.view?.superview
         
         switch property?.aligment {

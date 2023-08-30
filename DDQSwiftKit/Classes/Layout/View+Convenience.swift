@@ -144,19 +144,7 @@ public extension UIView {
         self.ddqSetSize(size: CGSize(width: self.ddqWidth, height: height))
     }
     
-    func ddqSetLayerCornerRadius(v: CGFloat) {
-        self.ddqSetLayer(radius: v, width: nil, color: nil)
-    }
-    
-    func ddqSetLayerBorderWidth(v: CGFloat) {
-        self.ddqSetLayer(radius: nil, width: v, color: nil)
-    }
-    
-    func ddqSetLayerBorderColor(c: UIColor) {
-        self.ddqSetLayer(radius: nil, width: nil, color: c)
-    }
-    
-    func ddqSetLayer(radius: CGFloat?, width: CGFloat?, color: UIColor?) {
+    func ddqSetLayer(radius: CGFloat? = nil, width: CGFloat? = nil, color: UIColor? = nil) {
         if let r = radius {
             self.layer.cornerRadius = r
         }

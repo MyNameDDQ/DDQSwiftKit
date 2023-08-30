@@ -7,29 +7,46 @@
 
 import UIKit
 
+public var ddqUserDefault: UserDefaults {
+    .standard
+}
+
+public var ddqNotificationCenter: NotificationCenter {
+    .default
+}
+
 open class DDQViewModel: NSObject {
 
-    private var observer: NSObjectProtocol?
-    static var oldValueKey: String = "DDQRegisterOldValueKey"
-    static var newValueKey: String = "DDQRegisterNewValueKey"
+    private var observers: [NSObjectProtocol] = []
+    public static var oldValueKey: String = "DDQRegisterOldValueKey"
+    public static var newValueKey: String = "DDQRegisterNewValueKey"
     
     deinit {
-        if let observer = self.observer {
-            NotificationCenter.default.removeObserver(observer)
+        ddqRemoveObserver()
+    }
+    
+    open func ddqRemoveObserver() {
+        self.observers.enumerated().forEach { objc in
+            ddqNotificationCenter.removeObserver(objc)
         }
     }
     
-    func ddqRegisterObserver(key: String, values: @escaping (_ contents: [String: Any]) -> Void) {
+    open func ddqRegisterObserver(key: String, values: @escaping (_ contents: [String: Any]) -> Void) {
         
         var dic: [String: Any] = .init()
-        let defaults = UserDefaults.standard
+        let defaults = ddqUserDefault
         dic.updateValue(defaults.object(forKey: key) ?? "", forKey: DDQViewModel.oldValueKey)
         
-        self.observer = NotificationCenter.default.addObserver(forName: UserDefaults.didChangeNotification, object: nil, queue: .main) { note in
-            
-            let user = note.object as! UserDefaults
-            dic.updateValue(user.object(forKey: key) ?? "", forKey: DDQViewModel.newValueKey)
-            values(dic)
+        let observer = ddqNotificationCenter.addObserver(forName: UserDefaults.didChangeNotification, object: nil, queue: .main) { note in
+            if let user = note.object as? UserDefaults {
+                
+                let objc = user.object(forKey: key) ?? ""
+                dic.updateValue(objc, forKey: DDQViewModel.newValueKey)
+                values(dic)
+                dic.updateValue(objc, forKey: DDQViewModel.oldValueKey)
+            }
         }
+        
+        self.observers.append(observer)
     }
 }

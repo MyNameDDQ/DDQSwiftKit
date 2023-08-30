@@ -10,5 +10,5 @@ import UIKit
  运用于cell
  */
 open class DDQCellModel: DDQModel {
-    var ddqReuseHeight: CGFloat = 0.0
+    public var ddqReuseHeight: CGFloat = 0.0
 }

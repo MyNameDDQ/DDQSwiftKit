@@ -10,10 +10,10 @@ import UIKit
 // 适用于双文字展示
 open class DDQTextView: DDQBasalLayoutView {
     
-    open var titleLabel: UILabel = .ddqLabel()
-    open var subTitleLabel: UILabel = .ddqLabel()
+    open private(set) var titleLabel: UILabel = .ddqLabel()
+    open private(set) var subTitleLabel: UILabel = .ddqLabel()
     
-    public convenience init(title: String?, subTitle: String?) {
+    public convenience init(title: String? = nil, subTitle: String? = nil) {
         
         self.init(frame: CGRect.zero)
         self.titleLabel.text = title

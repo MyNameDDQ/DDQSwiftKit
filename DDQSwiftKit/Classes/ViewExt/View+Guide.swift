@@ -206,9 +206,7 @@ extension CGFloat {
  工程中的字体处理
  */
 public extension UIFont {
-    class func ddqFont(size: CGFloat, weight: Weight) -> UIFont { systemFont(ofSize: size, weight: weight) }
-
-    class func ddqFont(size: CGFloat) -> UIFont { ddqFont(size: size, weight: .regular) }
+    class func ddqFont(size: CGFloat = .ddqTitleSize, weight: Weight = .regular) -> UIFont { systemFont(ofSize: size, weight: weight) }
     
     class func ddqFont() -> UIFont { ddqFont(size: .ddqTitleSize) }
     

@@ -7,354 +7,362 @@
 
 import UIKit
 
+public struct DDQBasalLayoutScale {
+    
+    /// 定宽
+    public var fixledWidth: CGFloat
+    
+    /// 宽高比
+    public var scale: CGFloat
+    
+    /// 不使用比例
+    public static let defaultScale: CGFloat = -1.0
+    
+    public init(fixledWidth: CGFloat, scale: CGFloat = defaultScale) {
+        self.fixledWidth = fixledWidth
+        self.scale = scale
+    }
+}
+
+public extension DDQBasalLayoutScale {
+    static var normal: DDQBasalLayoutScale {
+        get {
+            .init(fixledWidth: 0.0)
+        }
+    }
+}
+
 open class DDQBasalLayoutView: DDQView {
     public enum DDQBasalLayoutAlignment: Int {
-        
-        case center = 1
-        case left
+
         case top
-        case right
+        case left
         case bottom
-        case leftTop
-        case rightTop
-        case leftBottom
-        case rightBottom
+        case right
+        case center
     }
     
+    /**
+     布局时对齐方式
+     默认top
+     */
+    open var alignment: DDQBasalLayoutAlignment = .top {
+        didSet {
+            self.ddqSetNeedsLayout()
+        }
+    }
+
     public enum DDQBasalLayoutDirection: Int {
-            
-        case upperAndLower = 1
-        case leftAndRight
+
+        case vertical
+        case horizontal
+    }
+    
+    /**
+     布局时方向
+     默认vertical
+     */
+    open var direction: DDQBasalLayoutDirection = .vertical {
+        didSet {
+            self.ddqSetNeedsLayout()
+        }
+    }
+
+    public enum DDQBasalLayoutFixled: Int {
+
+        case width
+        case height
+    }
+
+    /**
+     布局时定宽还是定高
+     */
+    open var fixled: DDQBasalLayoutFixled = .width {
+        didSet {
+            self.ddqSetNeedsLayout()
+        }
     }
 
     open var mainView: UIView? {
         willSet {
             self.mainView?.removeFromSuperview()
         }
-        
+
         didSet {
-            if self.mainView != nil {
-                self.addSubview(self.mainView!)
+            if let mainView = self.mainView {
+                self.addSubview(mainView)
             }
         }
     }
-    
+
     open var subView: UIView? {
         willSet {
             self.subView?.removeFromSuperview()
         }
-        
+
         didSet {
-            if self.subView != nil {
-                self.addSubview(self.subView!)
+            if let subView = self.subView {
+                self.addSubview(subView)
             }
         }
     }
-    
+
     open var backgroundView: UIView? {
         willSet {
             self.backgroundView?.removeFromSuperview()
         }
-        
+
         didSet {
-            if self.backgroundView != nil {
-                self.insertSubview(self.backgroundView!, at: 0)
+            if let backgroundView = self.backgroundView {
+                self.insertSubview(backgroundView, at: 0)
             }
         }
     }
     
-    open var alignment: DDQBasalLayoutAlignment = .center {
+    /**
+    主视图在布局时的比例
+     */
+    open var mainScale: DDQBasalLayoutScale = .normal {
         didSet {
             self.ddqSetNeedsLayout()
         }
     }
     
-    open var direction: DDQBasalLayoutDirection = .leftAndRight {
+    /**
+     子视图布局时的比例
+     */
+    open var subScale: DDQBasalLayoutScale = .normal {
         didSet {
             self.ddqSetNeedsLayout()
         }
     }
 
     // 主视图的布局边界
-    open var insets: UIEdgeInsets = .zero {
+    open var edges: UIEdgeInsets = .zero {
         didSet {
             self.ddqSetNeedsLayout()
         }
     }
-    
+
     // 副视图的布局边界
     open var spacings: UIEdgeInsets = .zero {
         didSet {
             self.ddqSetNeedsLayout()
         }
     }
-        
+
     public convenience init(mainView: UIView, subView: UIView) {
-        
+
         self.init()
         self.mainView = mainView
-        if self.mainView != nil {
-            self.addSubview(self.mainView!)
-        }
-        
         self.subView = subView
-        if self.subView != nil {
-            self.addSubview(self.subView!)
+
+        if let main = self.mainView {
+            self.addSubview(main)
+        }
+
+        if let sub = self.subView {
+            self.addSubview(sub)
         }
     }
-    
+
     open override func ddqViewInitialize() {
-        
+
         super.ddqViewInitialize()
-        
+
         if let background = self.backgroundView {
             self.ddqAddSubViews(subViews: [background])
         }
     }
-    
+
     open override func sizeToFit() {
-        
+
         super.sizeToFit()
-        self.isSizeToFit = true
-        let fitSize = self.sizeThatFits(.init(width: 10000.0, height: 10000.0))
+        let fitSize = self.sizeThatFits(CGSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude))
         self.frame = .init(origin: .zero, size: fitSize)
     }
-    
+
     open override func sizeThatFits(_ size: CGSize) -> CGSize {
-    
+
         super.sizeThatFits(size)
+        self.fitSize = size
+        self.isSizeThatFit = true
         self.ddqLayoutSubviews(size: size)
         return self.sizeToFitFrame.size
     }
-    
-    open override func ddqLayoutSubviewsWhenSetFrame() -> Bool {
-        return true
+
+    open func sizeThatFitsInWidth(w: CGFloat) -> CGSize {
+        sizeThatFits(.init(width: w, height: .greatestFiniteMagnitude))
     }
-    
+
+    open func sizeThatFitsInHeight(h: CGFloat) -> CGSize {
+        sizeThatFits(.init(width: .greatestFiniteMagnitude, height: h))
+    }
+
+    open override func ddqLayoutSubviewsWhenSetFrame() -> Bool {
+        true
+    }
+
     private var sizeToFitFrame: CGRect = .zero
-    private var isSizeToFit: Bool = false
-    
+    private var isSizeThatFit: Bool = false
+    private var fitSize: CGSize = .zero
+
     open override func ddqLayoutSubviews(size: CGSize) {
-        
+
         super.ddqLayoutSubviews(size: size)
         
-        self.backgroundView?.frame = .init(origin: .zero, size: size)
-        
-        let mainV = self.mainView ?? .init()
-        let subV = self.subView ?? .init()
-        let _insets = self.insets
+        guard let mainV = self.mainView else { return }
+
+        guard let subV = self.subView else { return }
+
+        if let backgroundView = self.backgroundView {
+            backgroundView.frame.size = size
+        }
+
+        let _insets = self.edges
         let _spacings = self.spacings
-        
         let _alignment = self.alignment
         let _direction = self.direction
         
-        mainV.sizeToFit()
-        mainV.ddqSetOrigin(origin: .zero)
+        var mainSize: CGSize = .zero
+        var subSize: CGSize = .zero
+        var boundRect: CGRect = .zero
+                    
+        let _fixled = self.fixled
+        var boundSize = size
         
-        subV.sizeToFit()
-        subV.ddqSetOrigin(origin: .zero)
+        if self.isSizeThatFit {
+            boundSize = self.fitSize
+        }
+
+        var layoutW = boundSize.width - _insets.left - _insets.right
+        var layoutH = boundSize.height - _insets.top - _insets.bottom
+        var mainFitW = 0.0
+        var mainFitH = 0.0
+        var subFitW = 0.0
+        var subFitH = 0.0
+        let mainIsFixled = self.mainScale.fixledWidth > 0
+        let subIsFixled = self.subScale.fixledWidth > 0
+        let mainUseScale = self.mainScale.scale != DDQBasalLayoutScale.defaultScale
+        let subUseScale = self.subScale.scale != DDQBasalLayoutScale.defaultScale
         
-        let maxH = max(subV.ddqHeight, mainV.ddqHeight)
-        let maxW = max(subV.ddqWidth, mainV.ddqWidth)
-
-        if self.isSizeToFit {
-            
-            var rect: CGRect = .zero
-            if _direction == .leftAndRight {
-                
-                mainV.ddqMake { (make) in
-                    make.ddqLeft(property: self.ddqLeft, value: _insets.left).ddqCenterY(property: self.ddqCenterY, value: _insets.top).ddqUpdate()
-                }
-
-                subV.ddqMake { (make) in
-                    make.ddqLeft(property: mainV.ddqRight, value: _spacings.left).ddqCenterY(property: mainV.ddqCenterY, value: 0.0).ddqUpdate()
-                }
-                
-                rect = .init(origin: .zero, size: .init(width: subV.ddqMaxX + self.insets.right, height: self.insets.top + self.insets.bottom + max(mainV.ddqHeight, subV.ddqHeight)))
-            } else {
-                
-                mainV.ddqMake { (make) in
-                    make.ddqCenterX(property: self.ddqCenterX, value: _insets.left).ddqTop(property: self.ddqTop, value: _insets.top).ddqUpdate()
-                }
-                
-                subV.ddqMake { (make) in
-                    make.ddqCenterX(property: mainV.ddqCenterX, value: _spacings.left).ddqTop(property: mainV.ddqBottom, value: _spacings.top).ddqUpdate()
-                }
-                
-                rect = .init(origin: .zero, size: .init(width: maxW + _insets.left + _insets.right, height: _insets.top + mainV.ddqHeight + _spacings.top + subV.ddqHeight + _insets.bottom))
+        if _fixled == .width {
+            if _direction == .horizontal {
+                layoutW -= _spacings.left
             }
             
-            self.sizeToFitFrame = rect
-            
+            mainFitW = mainIsFixled ? self.mainScale.fixledWidth : layoutW
+            subFitW = subIsFixled ? self.subScale.fixledWidth : layoutW
+
+            mainFitH = mainUseScale ? mainFitW * self.mainScale.scale : .greatestFiniteMagnitude
+            subFitH = subUseScale ? subFitW * self.subScale.scale : .greatestFiniteMagnitude
+
         } else {
-            if _direction == .leftAndRight {
-                if _alignment == .center {
+            if _direction == .vertical {
+                layoutH -= _spacings.top
+            }
+            
+            mainFitW = mainIsFixled ? self.mainScale.fixledWidth : .greatestFiniteMagnitude
+            subFitW = subIsFixled ? self.subScale.fixledWidth : .greatestFiniteMagnitude
+
+            mainFitH = mainUseScale ? mainFitW * self.mainScale.scale : layoutH
+            subFitH = subUseScale ? subFitW * self.subScale.scale : layoutH
+        }
+        
+        let mainFitSize: CGSize = .init(width: mainFitW, height: mainFitH)
+        let subFitSize: CGSize = .init(width: subFitW, height: subFitH)
+        mainSize = mainUseScale ? mainFitSize : mainV.sizeThatFits(mainFitSize)
+        subSize = subUseScale ? subFitSize : subV.sizeThatFits(subFitSize)
+                
+        let maxW = max(mainSize.width, subSize.width)
+        let maxH = max(mainSize.height, subSize.height)
+        
+        if _direction == .vertical {
+            boundRect.size = .init(width: _insets.left + maxW + _insets.right, height: _insets.top + mainSize.height + _spacings.top + subSize.height + _insets.bottom)
+        } else {
+            boundRect.size = .init(width: _insets.left + mainSize.width + _spacings.left + subSize.width + _insets.right, height: _insets.top + maxH + _insets.bottom)
+        }
+        
+        self.sizeToFitFrame = boundRect
+        let view: UIView = .init(frame: boundRect)
+        
+        if _direction == .vertical {
+            
+            mainV.ddqMake { make in
+                switch _alignment {
+                case .center:
+                    _ = make.ddqCenterX(property: view.ddqCenterX, value: 0.0).ddqTop(property: view.ddqTop, value: _insets.top)
+                case .right:
+                    _ = make.ddqRight(property: view.ddqRight, value: _insets.right).ddqTop(property: view.ddqTop, value: _insets.top)
                     
-                    mainV.ddqMake { (make) in
-                        make.ddqRight(property: self.ddqCenterX, value: -_spacings.left * 0.5).ddqCenterY(property: self.ddqCenterY, value: _insets.top).ddqUpdate()
-                    }
-                    
-                    subV.ddqMake { (make) in
-                        make.ddqLeft(property: mainV.ddqRight, value: _spacings.left).ddqCenterY(property: mainV.ddqCenterY, value: _spacings.top).ddqUpdate()
-                    }
-                } else if _alignment == .left {
-                    
-                    mainV.ddqMake { (make) in
-                        make.ddqLeft(property: self.ddqLeft, value: _insets.left).ddqCenterY(property: self.ddqCenterY, value: _insets.top).ddqUpdate()
-                    }
-                    
-                    subV.ddqMake { (make) in
-                        make.ddqLeft(property: mainV.ddqRight, value: _spacings.left).ddqCenterY(property: mainV.ddqCenterY, value: _spacings.top).ddqUpdate()
-                    }
-                } else if _alignment == .top {
-                    
-                    mainV.ddqMake { (make) in
-                        make.ddqRight(property: self.ddqCenterX, value: -_spacings.left * 0.5).ddqTop(property: self.ddqTop, value: _insets.top).ddqUpdate()
-                    }
-                    
-                    subV.ddqMake { (make) in
-                        make.ddqLeft(property: mainV.ddqRight, value: _spacings.left).ddqCenterY(property: mainV.ddqCenterY, value: _spacings.top).ddqUpdate()
-                    }
-                } else if _alignment == .bottom {
-                    
-                    mainV.ddqMake { (make) in
-                        make.ddqRight(property: self.ddqCenterX, value: -_spacings.left * 0.5).ddqBottom(property: self.ddqBottom, value: -_insets.bottom).ddqUpdate()
-                    }
-                    
-                    subV.ddqMake { (make) in
-                        make.ddqLeft(property: mainV.ddqRight, value: _spacings.left).ddqCenterY(property: mainV.ddqCenterY, value: -_spacings.bottom).ddqUpdate()
-                    }
-                } else if _alignment == .right {
-                    
-                    subV.ddqMake { (make) in
-                        make.ddqRight(property: self.ddqRight, value: -_insets.right).ddqCenterY(property: self.ddqCenterY, value: _insets.top).ddqUpdate()
-                    }
-                    
-                    mainV.ddqMake { (make) in
-                        make.ddqRight(property: subV.ddqLeft, value: -_spacings.right).ddqCenterY(property: subV.ddqCenterY, value: _spacings.top).ddqUpdate()
-                    }
-                } else if _alignment == .leftTop {
-                    
-                    mainV.ddqMake { (make) in
-                        make.ddqLeft(property: self.ddqLeft, value: _insets.left).ddqCenterY(property: self.ddqTop, value: (maxH * 0.5 + _insets.top)).ddqUpdate()
-                    }
-                    
-                    subV.ddqMake { (make) in
-                        make.ddqLeft(property: mainV.ddqRight, value: _spacings.left).ddqCenterY(property: mainV.ddqCenterY, value: _spacings.top).ddqUpdate()
-                    }
-                } else if _alignment == .leftBottom {
-                    
-                    mainV.ddqMake { (make) in
-                        make.ddqLeft(property: self.ddqLeft, value: _insets.left).ddqCenterY(property: self.ddqBottom, value: -(maxH * 0.5 + _insets.bottom)).ddqUpdate()
-                    }
-                    
-                    subV.ddqMake { (make) in
-                        make.ddqLeft(property: mainV.ddqRight, value: _spacings.left).ddqCenterY(property: mainV.ddqCenterY, value: _spacings.top).ddqUpdate()
-                    }
-                } else if _alignment == .rightTop {
-                    
-                    subV.ddqMake { (make) in
-                        make.ddqRight(property: self.ddqRight, value: -_insets.right).ddqCenterY(property: self.ddqTop, value: (maxH * 0.5 + _insets.top)).ddqUpdate()
-                    }
-                    
-                    mainV.ddqMake { (make) in
-                        make.ddqRight(property: subV.ddqLeft, value: -_spacings.right).ddqCenterY(property: subV.ddqCenterY, value: _spacings.top).ddqUpdate()
-                    }
-                } else {
-                    
-                    subV.ddqMake { (make) in
-                        make.ddqRight(property: self.ddqRight, value: -_insets.right).ddqCenterY(property: self.ddqBottom, value: -(maxH * 0.5 + _insets.bottom)).ddqUpdate()
-                    }
-                    
-                    mainV.ddqMake { (make) in
-                        make.ddqRight(property: subV.ddqLeft, value: -_spacings.right).ddqCenterY(property: subV.ddqCenterY, value: -_spacings.bottom).ddqUpdate()
-                    }
+                default:
+                    _ = make.ddqLeft(property: view.ddqLeft, value: _insets.left).ddqTop(property: view.ddqTop, value: _insets.top)
                 }
-            } else {
-                if _alignment == .center {
-                    
-                    mainV.ddqMake { (make) in
-                        make.ddqCenterX(property: self.ddqCenterX, value: _insets.left).ddqBottom(property: self.ddqCenterY, value: -_spacings.top * 0.5).ddqUpdate()
-                    }
-                    
-                    subV.ddqMake { (make) in
-                        make.ddqCenterX(property: mainV.ddqCenterX, value: _spacings.left).ddqTop(property: mainV.ddqBottom, value: _spacings.top).ddqUpdate()
-                    }
-                } else if _alignment == .left {
-                    
-                    mainV.ddqMake { (make) in
-                        make.ddqCenterX(property: self.ddqLeft, value: (maxW * 0.5 + _insets.left)).ddqBottom(property: self.ddqCenterY, value: -_spacings.top * 0.5).ddqUpdate()
-                    }
-                    
-                    subV.ddqMake { (make) in
-                        make.ddqCenterX(property: mainV.ddqCenterX, value: _spacings.left).ddqTop(property: mainV.ddqBottom, value: _spacings.top).ddqUpdate()
-                    }
-                } else if _alignment == .top {
-                    
-                    mainV.ddqMake { (make) in
-                        make.ddqCenterX(property: self.ddqCenterX, value: _insets.left).ddqTop(property: self.ddqTop, value: _insets.top).ddqUpdate()
-                    }
-                    
-                    subV.ddqMake { (make) in
-                        make.ddqCenterX(property: mainV.ddqCenterX, value: _spacings.left).ddqTop(property: mainV.ddqBottom, value: _spacings.top).ddqUpdate()
-                    }
-                } else if _alignment == .bottom {
-                    
-                    subV.ddqMake { (make) in
-                        make.ddqCenterX(property: self.ddqCenterX, value: _insets.left).ddqBottom(property: self.ddqBottom, value: -_insets.bottom).ddqUpdate()
-                    }
-                    
-                    mainV.ddqMake { (make) in
-                        make.ddqCenterX(property: subV.ddqCenterX, value: _spacings.left).ddqBottom(property: subV.ddqTop, value: -spacings.top).ddqUpdate()
-                    }
-                } else if _alignment == .right {
-                    
-                    mainV.ddqMake { (make) in
-                        make.ddqCenterX(property: self.ddqRight, value: -(maxW * 0.5 + _insets.right)).ddqBottom(property: self.ddqCenterY, value: -_spacings.top).ddqUpdate()
-                    }
-                    
-                    subV.ddqMake { (make) in
-                        make.ddqCenterX(property: mainV.ddqCenterX, value: _spacings.left).ddqTop(property: mainV.ddqBottom, value: _spacings.top).ddqUpdate()
-                    }
-                } else if _alignment == .leftTop {
-                    
-                    mainV.ddqMake { (make) in
-                        make.ddqCenterX(property: self.ddqLeft, value: (maxW * 0.5 + _insets.left)).ddqTop(property: self.ddqTop, value: _insets.top).ddqUpdate()
-                    }
-                    
-                    subV.ddqMake { (make) in
-                        make.ddqCenterX(property: mainV.ddqCenterX, value: _spacings.left).ddqTop(property: mainV.ddqBottom, value: _spacings.top).ddqUpdate()
-                    }
-                } else if _alignment == .leftBottom {
-                    
-                    subV.ddqMake { (make) in
-                        make.ddqCenterX(property: self.ddqLeft, value: (maxW * 0.5 + _insets.left)).ddqBottom(property: self.ddqBottom, value: -_insets.bottom).ddqUpdate()
-                    }
-                    
-                    mainV.ddqMake { (make) in
-                        make.ddqCenterX(property: subV.ddqCenterX, value: _spacings.left).ddqBottom(property: subV.ddqTop, value: -_spacings.top).ddqUpdate()
-                    }
-                } else if _alignment == .rightTop {
-                    
-                    mainV.ddqMake { (make) in
-                        make.ddqCenterX(property: self.ddqRight, value: -(maxW * 0.5 + _insets.right)).ddqTop(property: self.ddqTop, value: _insets.top).ddqUpdate()
-                    }
-                    
-                    subV.ddqMake { (make) in
-                        make.ddqCenterX(property: mainV.ddqCenterX, value: _spacings.left).ddqTop(property: mainV.ddqBottom, value: _spacings.top).ddqUpdate()
-                    }
+                
+                if mainUseScale {
+                    make.ddqSize(size: mainFitSize)
                 } else {
+                    make.ddqSizeThatFits(size: mainFitSize)
+                }
+            }
+            
+            subV.ddqMake { make in
+                switch _alignment {
+                case .center:
+                    _ = make.ddqCenterX(property: mainV.ddqCenterX, value: 0.0).ddqTop(property: mainV.ddqBottom, value: _spacings.top)
                     
-                    subV.ddqMake { (make) in
-                        make.ddqCenterX(property: self.ddqRight, value: -(maxW * 0.5 + _insets.right)).ddqBottom(property: self.ddqBottom, value: -_insets.bottom).ddqUpdate()
-                    }
+                case .right:
+                    _ = make.ddqRight(property: mainV.ddqRight, value: 0.0).ddqTop(property: mainV.ddqBottom, value: _spacings.top)
                     
-                    mainV.ddqMake { (make) in
-                        make.ddqCenterX(property: subV.ddqCenterX, value: _spacings.left).ddqBottom(property: subV.ddqTop, value: -_spacings.top).ddqUpdate()
-                    }
+                default:
+                    _ = make.ddqLeft(property: mainV.ddqLeft, value: 0.0).ddqTop(property: mainV.ddqBottom, value: _spacings.top)
+                }
+                
+                if subUseScale {
+                    make.ddqSize(size: subFitSize)
+                } else {
+                    make.ddqSizeThatFits(size: subFitSize)
+                }
+            }
+        } else {
+            
+            mainV.ddqMake { make in
+                switch _alignment {
+                case .center:
+                    _ = make.ddqCenterY(property: view.ddqCenterY, value: 0.0).ddqLeft(property: view.ddqLeft, value: _insets.left)
+                    
+                case .bottom:
+                    _ = make.ddqBottom(property: view.ddqBottom, value: _insets.bottom).ddqLeft(property: view.ddqLeft, value: _insets.left)
+                    
+                default:
+                    _ = make.ddqLeft(property: view.ddqLeft, value: _insets.left).ddqTop(property: view.ddqTop, value: _insets.top)
+                }
+                
+                if mainUseScale {
+                    make.ddqSize(size: mainFitSize)
+                } else {
+                    make.ddqSizeThatFits(size: mainFitSize)
+                }
+            }
+            
+            subV.ddqMake { make in
+                switch _alignment {
+                case .center:
+                    _ = make.ddqCenterY(property: mainV.ddqCenterY, value: 0.0).ddqLeft(property: mainV.ddqRight, value: _spacings.left)
+                    
+                case .bottom:
+                    _ = make.ddqBottom(property: mainV.ddqBottom, value: 0.0).ddqLeft(property: mainV.ddqRight, value: _spacings.left)
+                    
+                default:
+                    _ = make.ddqTop(property: mainV.ddqTop, value: 0.0).ddqLeft(property: mainV.ddqRight, value: _spacings.left)
+                }
+                
+                if subUseScale {
+                    make.ddqSize(size: subFitSize)
+                } else {
+                    make.ddqSizeThatFits(size: subFitSize)
                 }
             }
         }
     }
 }
-
