@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'DDQSwiftKit'
-  s.version          = '1.0.1'
+  s.version          = '1.0.2'
   s.summary          = 'DDQKit swift version.'
   s.platform         = :ios, '9.0'
   s.ios.deployment_target = '9.0'
@@ -34,4 +34,6 @@ Pod::Spec.new do |s|
   s.dependency 'FDFullscreenPopGesture'
   s.dependency 'SnapKit'
   s.dependency 'SwiftGen'
+  s.dependency 'Kingfisher'
+  s.dependency 'Alamofire'
 end
