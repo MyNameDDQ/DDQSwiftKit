@@ -25,7 +25,7 @@ public extension DDQCellSeparatorMargin {
 }
 
 open class DDQCell: UITableViewCell {
-    public enum DDQCellSeparatorStyle: Int {
+    public enum DDQCellSeparatorStyle {
         
         case none
         case top

@@ -11,12 +11,12 @@ Pod::Spec.new do |s|
   s.version          = '1.0.2'
   s.summary          = 'DDQKit swift version.'
   s.platform         = :ios, '9.0'
+  s.swift_version = '5.0'
   s.ios.deployment_target = '9.0'
   s.homepage         = 'https://github.com/MyNameDDQ/DDQSwiftKit.git'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'MyNameDDQ' => '869795924@qq.com' }
   s.source           = { :git => 'https://github.com/MyNameDDQ/DDQSwiftKit.git', :tag => s.version.to_s }
-  #s.swift_version = '4.2'
   s.source_files = 'DDQSwiftKit/Classes/**/*'
   s.requires_arc = true
   s.pod_target_xcconfig = { 'VALID_ARCHS' => 'arm64 armv7 x86_64' }

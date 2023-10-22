@@ -47,7 +47,7 @@ public extension UIViewController {
             return
         }
         
-        if !nav.viewControllers.ddqIsBeyond(index: index) {
+        if !nav.viewControllers.ddqIsBeyond(index) {
             self.ddqPop(to: nav.viewControllers[index], animated: animated)
         }
     }

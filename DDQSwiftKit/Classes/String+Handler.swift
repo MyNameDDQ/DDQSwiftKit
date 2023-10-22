@@ -12,15 +12,24 @@ import SAMKeychain
 
 public extension String {
     func ddqTrimmingWhitespacesAndNewlines() -> String {
-        return self.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+        self.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
     }
     
-    func ddqHTMLTextToAttributedString(dic: [NSAttributedString.Key: Any]?) -> NSAttributedString? {
+    func ddqHTMLTextToAttributedString(dic: [NSAttributedString.Key: Any]? = nil) -> NSAttributedString? {
         
         var attributedString: NSAttributedString?
         
         do {
-            attributedString = try NSAttributedString.init(data: self.data(using: Encoding.utf8) ?? Data(), options: [NSAttributedString.DocumentReadingOptionKey.documentType: NSAttributedString.DocumentType.html], documentAttributes: nil)
+            if let data = self.ddqToData() {
+                
+                let html = try NSAttributedString.init(data: data, options: [NSAttributedString.DocumentReadingOptionKey.documentType: NSAttributedString.DocumentType.html], documentAttributes: nil).mutableCopy() as? NSMutableAttributedString
+                
+                if let d = dic, let l = html?.length {
+                    html?.addAttributes(d, range: .init(location: 0, length: l))
+                }
+                
+                attributedString = html?.copy() as? NSAttributedString
+            }
         } catch {
             #if DEBUG
                 NSLog("转换html字符串失败")
@@ -31,14 +40,62 @@ public extension String {
     }
     
     var ddqLength: Int {
-        return (self as NSString).length
+        self.indices.count
     }
     
-    func ddqSize(attributes: [NSAttributedString.Key: Any]) -> CGSize {
+    func ddqSize(attributes: [NSAttributedString.Key: Any]? = nil) -> CGSize {
         
         let label = UILabel.ddqAttributedLabel(text: self, attributes: attributes)
         label.sizeToFit()
         return label.ddqSize
+    }
+    
+    func ddqRemoveDuplicates() -> String {
+        self.enumerated().filter { element in
+            
+            let index = self.firstIndex(of: element.element)
+            return index?.utf16Offset(in: self) == element.offset
+            
+        }.map { $0.element }.ddqToString()
+    }
+    
+    func ddqSubString(_ range: Range<Int>) -> String {
+        if isEmpty {
+            return ""
+        }
+        
+        let start = range.startIndex
+        let end = range.endIndex
+        
+        if start > self.count || end > self.count {
+            return ""
+        }
+        
+        let s = self.index(.init(utf16Offset: start, in: self), offsetBy: 0)
+        let e = self.index(.init(utf16Offset: end, in: self), offsetBy: 0)
+        return String(self[s..<e])
+    }
+    
+    func ddqSubString(to: Int) -> String {
+        ddqSubString(0..<to)
+    }
+    
+    func ddqSubString(from: Int) -> String {
+        ddqSubString(from..<self.count)
+    }
+    
+    func ddqComponents(separtor: String = "") -> [String] {
+        if separtor != "" {
+            return self.components(separatedBy: separtor)
+        }
+        
+        var components: [String] = []
+        
+        self.forEach { char in
+            components.ddqAdd(String(char))
+        }
+        
+        return components
     }
 }
 
@@ -46,7 +103,7 @@ public extension String {
  TimeStamp
  */
 public extension String {
-    enum DDQTimeStampType: Int {
+    enum DDQTimeStampType {
         
         case second
         case millisecond
@@ -55,15 +112,14 @@ public extension String {
 
     static func ddqGetTimeStamp(type: DDQTimeStampType = .second) -> Double {
         
-        let date = Date()
-        var timeStamp = date.timeIntervalSince1970
+        var timeStamp = Date().timeIntervalSince1970
         
-        if type == .millisecond {
-            timeStamp *= 1000
-        } else if type == .microsecond {
-            timeStamp *= (1000 * 1000)
+        switch type {
+        case .millisecond: timeStamp *= 1000
+        case .microsecond: timeStamp *= (1000 * 1000)
+        default: break
         }
-        
+                
         return timeStamp
     }
         
@@ -92,60 +148,33 @@ public extension String {
  URL
  */
 public extension String {
+    func ddqGetUrlQueryItems() -> [URLQueryItem]? {
+        URLComponents.init(string: self)?.queryItems
+    }
+
     func ddqGetUrlQueryKeyValues() -> [String: String] {
-        
-        let items = ddqUrlHaveQueryValue()
-        
-        guard items != nil else {
+        guard let items = ddqGetUrlQueryItems() else {
             return [:]
         }
         
         var keyValues: [String: String] = [:]
         
-        for item in items! {
+        for item in items {
             keyValues.updateValue(item.value ?? "", forKey: item.name)
         }
         
         return keyValues
     }
 
-    func ddqGetUrlQueryValueForKey(key: String) -> String {
-
-        let keyValues = ddqGetUrlQueryKeyValues()
-        
-        guard !keyValues.isEmpty else {
-            return String()
-        }
-        
-        return keyValues[key] ?? String()
+    func ddqGetUrlQueryValueForKey(_ key: String) -> String {
+        ddqGetUrlQueryKeyValues().ddqStringFor(key)
     }
     
     func ddqGetUrlQueryValueForKeys(keys: [String]) -> [String: String] {
-        
-        let keyValues = ddqGetUrlQueryKeyValues()
-        
-        guard !keyValues.isEmpty else {
-            return [:]
-        }
-
-        var values: [String: String] = [:]
-        
-        for key in keyValues.keys {
-            if keys.contains(key) {
-                values.updateValue(keyValues[key] ?? String(), forKey: key)
-            }
-        }
-        
-        return values
+        ddqGetUrlQueryKeyValues().filter { element in keys.contains { element.key == $0 } }
     }
-    
-    func ddqUrlHaveQueryValue() -> [URLQueryItem]? {
         
-        let components = URLComponents.init(string: self)
-        return components?.queryItems
-    }
-    
-    func ddqAppendUrlQueryWithKeyValues(dic: [String: String]) -> String {
+    func ddqAddUrlQueryWithKeyValues(dic: [String: String]) -> String {
         
         var components = URLComponents(string: self)
         
@@ -155,66 +184,30 @@ public extension String {
         
         var items: [URLQueryItem] = []
         var existKeyValues = ddqGetUrlQueryKeyValues()
+        existKeyValues.ddqAddEntries(dic)
         
-        if existKeyValues.isEmpty {
-            for (key, value) in dic {
-                
-                let item = URLQueryItem.init(name: key, value: value)
-                items.append(item)
-            }
-        } else {
-            
-            let notExist = dic.filter { (element) -> Bool in
-                if existKeyValues.keys.contains(element.key) {// 更新已有item
-                    
-                    existKeyValues.updateValue(element.value, forKey: element.key)
-                    return false
-                }
-                
-                return true
-            }
-            
-            for (key, value) in existKeyValues {
-                
-                let item = URLQueryItem(name: key, value: value)
-                items.append(item)
-            }
-            
-            for (key, value) in notExist {// 拼接剩下数据
-                
-                let item = URLQueryItem(name: key, value: value)
-                items.append(item)
-            }
+        for (key, value) in existKeyValues {
+            items.ddqAdd(.init(name: key, value: value))
         }
         
         components?.queryItems = items
         return components?.url?.absoluteString ?? self
     }
     
-    func ddqReomveUrlQueryWithKey(key: String) -> String {
+    func ddqRemoveUrlQueryWithKey(key: String) -> String {
         ddqRemoveUrlQueryWithKeys(keys: [key])
     }
     
     func ddqRemoveUrlQueryWithKeys(keys: [String]) -> String {
         
-        var components = URLComponents(string: self)
-        
-        guard components != nil else {
-            return self
-        }
-        
-        var items: [URLQueryItem] = []
         var existKeyValues = ddqGetUrlQueryKeyValues()
         
         if existKeyValues.isEmpty {
             return self
         }
-        
-        keys.forEach { key in
-            if existKeyValues.keys.contains(key) {
-                existKeyValues.removeValue(forKey: key)
-            }
-        }
+    
+        var items: [URLQueryItem] = []
+        existKeyValues.ddqRemoveForKeys(keys)
         
         for (key, value) in existKeyValues {
             
@@ -222,6 +215,7 @@ public extension String {
             items.append(item)
         }
         
+        var components = URLComponents(string: self)
         components?.queryItems = items
         return components?.url?.absoluteString ?? self
     }
@@ -231,29 +225,30 @@ public extension String {
  infoPlist
  */
 public extension String {
-    static func ddqGetAppVersion() -> String {
-        return Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
+    enum DDQInfoPlistType {
+        
+        case appVersion
+        case displayName
+        case bundleId
+        case deviceBrand
     }
     
-    static func ddqGetDisplayName() -> String {
-        return Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as! String
+    static func ddqGetInfoPlist(type: DDQInfoPlistType = .deviceBrand) -> String {
+        switch type {
+        case .appVersion: return Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? ""
+        case .displayName: return Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String ?? ""
+        case .bundleId: return Bundle.main.object(forInfoDictionaryKey: "CFBundleIdentifier") as? String ?? ""
+        default: return UIDevice.current.model
+        }
     }
-    
-    static func ddqGetBundleId() -> String {
-        return Bundle.main.object(forInfoDictionaryKey: "CFBundleIdentifier") as! String
-    }
-    
-    static func ddqGetDeviceBrand() -> String {
-        return UIDevice.current.model
-    }
-    
+        
     func ddqValidateNewestAppVersion(version: String) -> Bool {
         if self.isEmpty || version.isEmpty {
             return false
         }
         
         let current: [String] = self.components(separatedBy: ".")
-        
+    
         guard !current.isEmpty else {
             return false
         }
@@ -461,7 +456,7 @@ public extension String {
     /// 获取设备Id
     static func ddqGetDeviceID() -> String {
         
-        let service = String.ddqGetBundleId()
+        let service = String.ddqGetInfoPlist(type: .bundleId)
         
         guard let password = SAMKeychain.password(forService: service, account: "uuid") else {
             

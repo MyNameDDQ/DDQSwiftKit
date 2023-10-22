@@ -200,7 +200,7 @@ public extension UIImage {
         return image?.withRenderingMode(mode);
     }
     
-    func ddqScaleImageToSize(size: CGSize) -> UIImage? {
+    func ddqScaleImageToSize(_ size: CGSize) -> UIImage? {
 
         UIGraphicsBeginImageContextWithOptions(size, false, UIScreen.main.scale)
         self.draw(in: CGRect.init(origin: CGPoint.zero, size: size))
@@ -209,14 +209,14 @@ public extension UIImage {
         return image
     }
     
-    func ddqScaleImageForWidth(width: CGFloat) -> UIImage? {
+    func ddqScaleImageForWidth(_ width: CGFloat) -> UIImage? {
         
         let height = width * size.height / size.width
-        return ddqScaleImageToSize(size: CGSize(width: width, height: height))
+        return ddqScaleImageToSize(CGSize(width: width, height: height))
     }
     
     // 将图片压缩至对应大小，传kb
-    func ddqScaleImageToBitSize(size: Int) -> UIImage? {
+    func ddqScaleImageToBitSize(_ size: Int) -> UIImage? {
         
         let bit: Int = size * 1024
         var startQuality: CGFloat = 0.95
@@ -235,10 +235,10 @@ public extension UIImage {
     
     // 不能超过32k
     func ddqScaleImageToWeChatSize() -> UIImage? {
-        return ddqScaleImageToBitSize(size: 32)
+        return ddqScaleImageToBitSize(32)
     }
     
-    func ddqScaleImageToQuality(q: CGFloat) -> UIImage? {
+    func ddqScaleImageToQuality(_ q: CGFloat) -> UIImage? {
         if let imageData: Data = self.sd_imageData(as: .JPEG, compressionQuality: q.ddqToDouble()) {
             return UIImage.init(data: imageData, scale: UIScreen.main.scale)
         }
@@ -254,7 +254,7 @@ public extension UIImage {
         return nil
     }
     
-    class func ddqImageWithColor(color: UIColor, size: CGSize) -> UIImage? {
+    class func ddqImageWithColor(_ color: UIColor, size: CGSize) -> UIImage? {
         
         let view = UIView.ddqView(backgroundColor: color)
         view.frame = .init(origin: .zero, size: size)
@@ -277,7 +277,7 @@ public extension UIImage {
     
     @available(iOS 13.0, *)
     class func ddqImageWithUserStyle(style: UIUserInterfaceStyle, size: CGSize) -> UIImage {
-        return style == .light ? ddqImageWithColor(color: .white, size: size) ?? .init() : ddqImageWithColor(color: .black, size: size) ?? .init()
+        return style == .light ? ddqImageWithColor(.white, size: size) ?? .init() : ddqImageWithColor(.black, size: size) ?? .init()
     }
     
     @available(iOS 13.0, *)
@@ -290,7 +290,7 @@ public extension UIImage {
             return ddqImageWithUserStyle(style: UITraitCollection.current.userInterfaceStyle, size: _imageDefaultSize())
         }
         
-        return ddqImageWithColor(color: .white, size: _imageDefaultSize()) ?? .init()
+        return ddqImageWithColor(.white, size: _imageDefaultSize()) ?? .init()
     }
 }
 
@@ -301,7 +301,7 @@ public extension UIImageView {
         self.image = image
     }
     
-    func ddqSetWebImage(url: String, placeholder: UIImage? = nil, placeholderName: String? = nil, completed: SDExternalCompletionBlock? = nil) {
+    func ddqSetWebImage(_ url: String, placeholder: UIImage? = nil, placeholderName: String? = nil, completed: SDExternalCompletionBlock? = nil) {
         
         var image = placeholder
         

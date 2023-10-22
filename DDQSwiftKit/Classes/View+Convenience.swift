@@ -114,34 +114,34 @@ public extension UIView {
 }
 
 public extension UIView {
-    func ddqSetOrigin(origin: CGPoint) {
+    func ddqSetOrigin(_ origin: CGPoint) {
         
         var frame = self.frame
         frame.origin = origin
         self.frame = frame
     }
     
-    func ddqSetX(x: CGFloat) {
-        self.ddqSetOrigin(origin: CGPoint(x: x, y: self.ddqY))
+    func ddqSetX(_ x: CGFloat) {
+        self.ddqSetOrigin(CGPoint(x: x, y: self.ddqY))
     }
     
-    func ddqSetY(y: CGFloat) {
-        self.ddqSetOrigin(origin: CGPoint(x: self.ddqX, y: y))
+    func ddqSetY(_ y: CGFloat) {
+        self.ddqSetOrigin(CGPoint(x: self.ddqX, y: y))
     }
     
-    func ddqSetSize(size: CGSize) {
+    func ddqSetSize(_ size: CGSize) {
         
         var frame = self.frame
         frame.size = size
         self.frame = frame
     }
     
-    func ddqSetWidth(width: CGFloat) {
-        self.ddqSetSize(size: CGSize(width: width, height: self.ddqHeight))
+    func ddqSetWidth(_ width: CGFloat) {
+        self.ddqSetSize(CGSize(width: width, height: self.ddqHeight))
     }
     
-    func ddqSetHeight(height: CGFloat) {
-        self.ddqSetSize(size: CGSize(width: self.ddqWidth, height: height))
+    func ddqSetHeight(_ height: CGFloat) {
+        self.ddqSetSize(CGSize(width: self.ddqWidth, height: height))
     }
     
     func ddqSetLayer(radius: CGFloat? = nil, width: CGFloat? = nil, color: UIColor? = nil) {
