@@ -9,7 +9,7 @@ import UIKit
 
 public extension UIViewController {
     func ddqPop(to: UIViewController? = nil, animated: Bool = true) {
-        guard let nav = self.navigationController else {
+        guard let nav = navigationController else {
             return
         }
         
@@ -21,14 +21,14 @@ public extension UIViewController {
     }
 
     func ddqPop(cClass: AnyClass, animated: Bool = true) {
-        guard let nav = self.navigationController else {
+        guard let nav = navigationController else {
             return
         }
         
         var target: UIViewController?
         
         for controller in nav.viewControllers {
-            if controller.self.isEqual(cClass) {
+            if controller.isEqual(cClass) {
                 
                 target = controller
                 break
@@ -39,21 +39,21 @@ public extension UIViewController {
             return
         }
         
-        self.ddqPop(to: controller, animated: animated)
+        ddqPop(to: controller, animated: animated)
     }
     
     func ddqPop(index: Int, animated: Bool = true) {
-        guard let nav = self.navigationController else {
+        guard let nav = navigationController else {
             return
         }
         
         if !nav.viewControllers.ddqIsBeyond(index) {
-            self.ddqPop(to: nav.viewControllers[index], animated: animated)
+            ddqPop(to: nav.viewControllers[index], animated: animated)
         }
     }
     
     func ddqPush(to: UIViewController, title: String? = nil, animated: Bool = true) {
-        guard let nav = self.navigationController else {
+        guard let nav = navigationController else {
             return
         }
                     
@@ -77,7 +77,7 @@ public extension UIViewController {
                     vc = a.init()
                 }
                 
-                self.ddqPush(to: vc, title: title, animated: animated)
+                ddqPush(to: vc, title: title, animated: animated)
             }
         }
     }
@@ -86,9 +86,9 @@ public extension UIViewController {
 public extension UIViewController {
     var ddqSafeInsets: UIEdgeInsets {
         if #available(iOS 13.0, *) {
-            return self.view.safeAreaInsets
+            return view.safeAreaInsets
         } else {
-            return .init(top: self.topLayoutGuide.length, left: 0.0, bottom: self.bottomLayoutGuide.length, right: 0.0)
+            return .init(top: topLayoutGuide.length, left: 0.0, bottom: bottomLayoutGuide.length, right: 0.0)
         }
     }
 }

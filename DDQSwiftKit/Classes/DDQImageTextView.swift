@@ -8,8 +8,8 @@
 import UIKit
 
 // 适用于图片与文字展示
-open class DDQImageTextLayoutView: DDQBasalLayoutView {
-    public enum DDQImageTextLayoutStyle: Int {
+open class DDQImageTextLayoutView: DDQLayoutView {
+    public enum LayoutStyle {
         
         case LImageRText
         case LTextRImage
@@ -19,71 +19,71 @@ open class DDQImageTextLayoutView: DDQBasalLayoutView {
     
     open var imageView: UIImageView = .ddqImageView() // mainView
     open var titleLabel: UILabel = .ddqLabel(text: nil, font: nil, textColor: .black) // subView
-    open var style: DDQImageTextLayoutStyle = .TImageBText {
+    open var style: LayoutStyle = .TImageBText {
         didSet {
             
-            self._handleLayout()
-            self.ddqSetNeedsLayout()
+            _handleLayout()
+            ddqSetNeedsLayout()
         }
     }
     
     open func setImage(image: UIImage?) {
-        self.imageView.image = image
+        imageView.image = image
     }
     
     open func setTitle(title: String?) {
-        self.titleLabel.text = title
+        titleLabel.text = title
     }
     
     open func setAttributedTitle(attributedTitle: NSAttributedString?) {
-        self.titleLabel.attributedText = attributedTitle
+        titleLabel.attributedText = attributedTitle
     }
         
     public convenience init(title: String?, image: UIImage?) {
     
         self.init(frame: .zero)
-        self.imageView.image = image
-        self.titleLabel.text = title
+        imageView.image = image
+        titleLabel.text = title
     }
     
     open override func ddqViewInitialize() {
         
         super.ddqViewInitialize()
-        self._handleLayout()
+        _handleLayout()
     }
     
     private func _handleLayout() {
         
-        self.mainView = nil
-        self.subView = nil
+        mainView = nil
+        subView = nil
         
         var main: UIView
         var sub: UIView
         
-        switch self.style {
+        switch style {
             case .TImageBText:
-                main = self.imageView
-                sub = self.titleLabel
-                self.direction = .vertical
+                main = imageView
+                sub = titleLabel
+                direction = .vertical
 
             case .LImageRText:
-                main = self.imageView
-                sub = self.titleLabel
-                self.direction = .horizontal
+                main = imageView
+                sub = titleLabel
+                direction = .horizontal
 
             case .LTextRImage:
-                main = self.titleLabel
-                sub = self.imageView
-                self.direction = .horizontal
+                main = titleLabel
+                sub = imageView
+                direction = .horizontal
 
             default:
-                main = self.titleLabel
-                sub = self.imageView
-                self.direction = .vertical
+                main = titleLabel
+                sub = imageView
+                direction = .vertical
         }
         
-        self.mainView = main
-        self.subView = sub
+        mainView = main
+        subView = sub
     }
 }
 

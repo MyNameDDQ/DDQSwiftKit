@@ -11,23 +11,11 @@ import UIKit
  工程中对颜色的处理
  */
 public extension UIColor {
-    class func ddqColorWithRGBAC(red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat, component: CGFloat) -> UIColor {
-        UIColor.init(red: red / 255.0, green: green / 255.0, blue: blue / 255.0, alpha: alpha).withAlphaComponent(component)
+    class func ddqColorWithRGB(red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat = 1.0, component: CGFloat = 1.0) -> UIColor {
+        .init(red: red / 255.0, green: green / 255.0, blue: blue / 255.0, alpha: alpha).withAlphaComponent(component)
     }
 
-    class func ddqColorWithRGB(red: CGFloat, green: CGFloat, blue: CGFloat) -> UIColor {
-        ddqColorWithRGBAC(red: red, green: green, blue: blue, alpha: 1.0, component: 1.0)
-    }
-
-    class func ddqColorWithRGBA(red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat) -> UIColor {
-        ddqColorWithRGBAC(red: red, green: green, blue: blue, alpha: alpha, component: 1.0)
-    }
-
-    class func ddqColorWithRGBC(red: CGFloat, green: CGFloat, blue: CGFloat, component: CGFloat) -> UIColor {
-        ddqColorWithRGBAC(red: red, green: green, blue: blue, alpha: 1.0, component: component)
-    }
-
-    class func ddqColorWithHexAC(hexString: String?, alpha: CGFloat, component: CGFloat) -> UIColor {
+    class func ddqColorWithHex(hexString: String?, alpha: CGFloat = 1.0, component: CGFloat = 1.0) -> UIColor {
         guard hexString != nil else {
             return clear
         }
@@ -45,22 +33,7 @@ public extension UIColor {
         let r = Int(color >> 16) & mask
         let g = Int(color >> 8) & mask
         let b = Int(color) & mask
-        let red   = CGFloat(r) / 255.0
-        let green = CGFloat(g) / 255.0
-        let blue  = CGFloat(b) / 255.0
-        return ddqColorWithRGBAC(red: red, green: green, blue: blue, alpha: alpha, component: component)
-    }
-
-    class func ddqColorWithHexA(hexString: String?, alpha: CGFloat) -> UIColor {
-        ddqColorWithHexAC(hexString: hexString, alpha: alpha, component: 1.0)
-    }
-
-    class func ddqColorWithHexC(hexString: String?, component: CGFloat) -> UIColor {
-        ddqColorWithHexAC(hexString: hexString, alpha: 1.0, component: component)
-    }
-
-    class func ddqColorWithHex(hexString: String?) -> UIColor {
-        ddqColorWithHexAC(hexString: hexString, alpha: 1.0, component: 1.0)
+        return ddqColorWithRGB(red: r.ddqToCGFloat(), green: g.ddqToCGFloat(), blue: b.ddqToCGFloat(), alpha: alpha, component: component)
     }
 
     func ddqColorToHexString() -> String? {
@@ -71,7 +44,7 @@ public extension UIColor {
         var alpha: CGFloat = 0
         let multiplier = CGFloat(255.999999)
         
-        guard self.getRed(&red, green: &green, blue: &blue, alpha: &alpha) else {
+        guard getRed(&red, green: &green, blue: &blue, alpha: &alpha) else {
             return nil
         }
                  
@@ -210,5 +183,5 @@ public extension UIFont {
     
     class func ddqFont() -> UIFont { ddqFont(size: .ddqTitleSize) }
     
-    func ddqFont(offset: CGFloat) -> UIFont { .ddqFont(size: self.pointSize - offset) }
+    func ddqFont(offset: CGFloat) -> UIFont { .ddqFont(size: pointSize - offset) }
 }

@@ -13,7 +13,7 @@ public extension Array {
             return true
         }
         
-        return index >= self.count
+        return index >= count
     }
     
     func ddqElement(_ at: Int) -> Element? {
@@ -25,8 +25,8 @@ public extension Array {
     }
     
     func ddqForEach(_ block: (_ index:  Int, _ element: Element) -> Void) {
-        for (i, e) in self.enumerated() {
-            block(i, e)
+        enumerated().forEach {
+            block($0.offset, $0.element)
         }
     }
     
@@ -83,7 +83,7 @@ public extension Array {
     /// let a: [Int] = xx.ddqFilter()
     /// loadObject(xx.ddqFilter())
     func ddqFilter<T>() -> [T] {
-        self.filter { $0 is T }.map { $0 as! T }
+        filter { $0 is T }.map { $0 as! T }
     }
     
     /// let a: [Int] = .ddqFilter([1, 2, 3])
@@ -99,15 +99,15 @@ public extension Array {
 
         if separator == "" {
             
-            self.forEach { element in
+            forEach { element in
                 string.append("\(element)")
             }
             
             return string
         }
         
-        self.enumerated().forEach { element in
-            if element.offset == self.count - 1 {
+        enumerated().forEach { element in
+            if element.offset == count - 1 {
                 string.append("\(element.element)")
             } else {
                 string.append("\(element.element)\(separator)")
@@ -122,7 +122,7 @@ public extension Array {
 public extension Array where Element: Identifiable {
     mutating func ddqRemoveElements(_ elements: [Element]) {
         elements.ddqForEach { _, element in
-            if let index = self.firstIndex(where: { $0.id == element.id}) {
+            if let index = firstIndex(where: { $0.id == element.id}) {
                 ddqRemove(index)
             }
         }
@@ -135,37 +135,58 @@ public extension Array where Element: Identifiable {
     /// - Parameters:
     ///   - others: 另一个字典
     ///   - duplicates: 是不是去重。默认去重
-    mutating func ddqMerge(_ others: [Element], duplicates: Bool = true) {
-        ddqAddElements(duplicates ? others.filter { element in !self.contains { $0.id != element.id } } : others)
+    mutating func ddqMerge(_ others: [Element], duplicates: Bool = true, filter: ((_ obj1: Element, _ obj2: Element) -> Bool)?) {
+        
+        var arr = others
+        
+        if duplicates {
+            let sub = others.filter { obj1 in
+                if let f = filter {
+                    return !contains { obj2 in
+                        f(obj1, obj2)
+                    }
+                } else {
+                    return !contains { $0.id == obj1.id}
+                }
+            }
+            
+            arr = sub
+        }
+        
+        ddqAddElements(arr)
     }
 
     func ddqContain(_ element: Element) -> Bool {
-        self.contains { $0.id == element.id }
+        contains { $0.id == element.id }
     }
         
-    func ddqRemoveDuplicates() -> [Element] {
-        self.enumerated().filter { (index , element) in
-            self.firstIndex(where: { $0.id == element.id}) == index
+    func ddqRemoveDuplicates(_ completed: ((_ index: Int, _ objc: Element) -> Bool)? = nil) -> [Element] {
+        enumerated().filter { (index , element) in
+            if let c = completed {
+                return c(index, element)
+            } else {
+                return firstIndex(where: { $0.id == element.id}) == index
+            }
         }.map { $0.element }
     }
     
     func ddqIndex(_ element: Element) -> Int? {
-        self.firstIndex(where: { $0.id == element.id})
+        firstIndex(where: { $0.id == element.id})
     }
     
     func ddqIsFirst(_ element: Element) -> Bool {
-        self.first?.id == element.id
+        first?.id == element.id
     }
     
     func ddqIsLast(_ element: Element) -> Bool {
-        self.last?.id == element.id
+        last?.id == element.id
     }
 }
 
 public extension Array where Element: Equatable {
     mutating func ddqRemoveElements(_ elements: [Element]) {
         elements.ddqForEach { _, element in
-            if let index = self.firstIndex(where: { $0 == element}) {
+            if let index = firstIndex(where: { $0 == element}) {
                 ddqRemove(index)
             }
         }
@@ -178,35 +199,58 @@ public extension Array where Element: Equatable {
     /// - Parameters:
     ///   - others: 另一个字典
     ///   - duplicates: 是不是去重。默认去重
-    mutating func ddqMerge(_ others: [Element], duplicates: Bool = true) {
-        ddqAddElements(duplicates ? others.filter { element in !self.contains { $0 == element } } : others)
+    mutating func ddqMerge(_ others: [Element], duplicates: Bool = true, filter: ((_ obj1: Element, _ obj2: Element) -> Bool)?) {
+        
+        var arr = others
+        
+        if duplicates {
+            let sub = others.filter { obj1 in
+                if let f = filter {
+                    return !contains { obj2 in
+                        f(obj1, obj2)
+                    }
+                } else {
+                    return !contains(obj1)
+                }
+            }
+            
+            arr = sub
+        }
+        
+        ddqAddElements(arr)
     }
 
     func ddqContain(_ element: Element) -> Bool {
-        self.contains { $0 == element }
+        contains { $0 == element }
     }
 
-    func ddqRemoveDuplicates() -> [Element] {
-        self.enumerated().filter { self.firstIndex(of: $0.element) == $0.offset }.map { $0.element }
+    func ddqRemoveDuplicates(_ completed: ((_ index: Int, _ objc: Element) -> Bool)? = nil) -> [Element] {
+        enumerated().filter {
+            if let c = completed {
+                return c($0.offset, $0.element)
+            } else {
+                return firstIndex(of: $0.element) == $0.offset
+            }
+        }.map { $0.element }
     }
                     
     func ddqIndex(_ element: Element) -> Int? {
-        self.firstIndex(of: element)
+        firstIndex(of: element)
     }
     
     func ddqIsFirst(_ element: Element) -> Bool {
-        self.first == element
+        first == element
     }
     
     func ddqIsLast(_ element: Element) -> Bool {
-        self.last == element
+        last == element
     }
 }
 
 public extension Array where Element: Comparable {
     func ddqSortedArray(ascending: Bool = true) -> [Element] {
         
-        return self.sorted { (objc1, objc2) -> Bool in
+        return sorted { (objc1, objc2) -> Bool in
             if ascending {
                 return objc1 < objc2
             }

@@ -13,7 +13,7 @@ public extension Dictionary {
     }
     
     func ddqToJsonString(encoding: String.Encoding = .utf8) -> String? {
-        guard let data = self.ddqToData() else {
+        guard let data = ddqToData() else {
             return nil
         }
         
@@ -31,7 +31,7 @@ public extension Array {
     }
 
     func ddqToJsonString(encoding: String.Encoding = .utf8) -> String? {
-        guard let data = self.ddqToData() else {
+        guard let data = ddqToData() else {
             return nil
         }
         
@@ -45,7 +45,7 @@ public extension Array {
 
 public extension String {
     func ddqToData(encoding: String.Encoding = .utf8) -> Data? {
-        return self.data(using: encoding)
+        return data(using: encoding)
     }
     
     func ddqBase64StringToData() -> Data? {
@@ -59,13 +59,13 @@ public extension String {
     }
     
     func ddqToBase64() -> String? {
-        return self.ddqToData()?.ddqToBase64()
+        return ddqToData()?.ddqToBase64()
     }
 }
 
 public extension Data {
     func ddqToBase64() -> String {
-        return self.base64EncodedString()
+        return base64EncodedString()
     }
     
     func ddqToMD5(encoding: String.Encoding = .utf8) -> String? {

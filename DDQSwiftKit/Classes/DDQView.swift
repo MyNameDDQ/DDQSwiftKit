@@ -19,30 +19,30 @@ open class DDQView: UIView {
     
     open func ddqViewInitialize() {
         
-        self.ddqIsInitialize = true
-        self.backgroundColor = .ddqBackgroundColor()
+        ddqIsInitialize = true
+        backgroundColor = .ddqBackgroundColor()
     }
     
     open func ddqLayoutSubviews(size: CGSize) {
-        self.ddqIsLayoutSubviews = true
+        ddqIsLayoutSubviews = true
     }
     
     open func ddqSetNeedsLayout() {
-        if self.ddqIsLayoutSubviews {
-            self.setNeedsLayout()
+        if ddqIsLayoutSubviews {
+            setNeedsLayout()
         }
     }
             
     public override init(frame: CGRect) {
         
         super.init(frame: frame)
-        self.ddqViewInitialize()
+        ddqViewInitialize()
     }
     
     required public init?(coder: NSCoder) {
     
         super.init(coder: coder)
-        self.ddqViewInitialize()
+        ddqViewInitialize()
     }
     
     open override class var requiresConstraintBasedLayout: Bool {
@@ -52,13 +52,13 @@ open class DDQView: UIView {
     open override func layoutSubviews() {
         
         super.layoutSubviews()
-        self.ddqLayoutSubviews(size: self.ddqSize)
+        ddqLayoutSubviews(size: ddqSize)
     }
             
     open override var frame: CGRect {
         didSet {
-            if self.ddqLayoutSubviewsWhenSetFrame() {
-                self.ddqLayoutSubviews(size: frame.size)
+            if ddqLayoutSubviewsWhenSetFrame() {
+                ddqLayoutSubviews(size: frame.size)
             }
         }
     }

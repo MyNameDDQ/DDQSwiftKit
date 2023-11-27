@@ -34,17 +34,17 @@ public extension Int {
     
     /// 人民币：分 -> 元
     func ddqToYuan() -> Double {
-        self.ddqToDouble() / 100.0
+        ddqToDouble() / 100.0
     }
     
     /// 人民币：元 -> 分
     func ddqToFen() -> Double {
-        self.ddqToDouble() * 100.0
+        ddqToDouble() * 100.0
     }
     
     func ddqToDateString(formatter: String? = nil) -> String {
         
-        let date = Date(timeIntervalSince1970: self.ddqToDouble())
+        let date = Date(timeIntervalSince1970: ddqToDouble())
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = formatter ?? "yyyy-MM-dd HH:mm"
         return dateFormatter.string(from: date)

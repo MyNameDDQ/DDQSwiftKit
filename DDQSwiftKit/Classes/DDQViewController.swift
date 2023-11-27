@@ -11,7 +11,7 @@ import UIKit
  统一一些写法和参数
  */
 open class DDQViewController: UIViewController {
-    public enum DDQViewControllerTableStyle: Int {
+    public enum TableStyle {
         
         case none
         case grouped
@@ -26,41 +26,41 @@ open class DDQViewController: UIViewController {
     public override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-        self.ddqControllerInitialize()
+        ddqControllerInitialize()
     }
     
     required public init?(coder: NSCoder) {
         
         super.init(coder: coder)
-        self.ddqControllerInitialize()
+        ddqControllerInitialize()
     }
         
     open override func viewDidLoad() {
         
         super.viewDidLoad()
-        self.ddqConfigSubviews()
-        self.ddqConfigNavgationBar()
-        self.ddqRegisterNotification()
+        ddqConfigSubviews()
+        ddqConfigNavgationBar()
+        ddqRegisterNotification()
     }
     
     open override func viewWillLayoutSubviews() {
         
         super.viewWillLayoutSubviews()
         
-        if let tableView = self.tableView {
+        if let tableView = tableView {
             tableView.ddqMake { make in
-                make.ddqInsets(insets: self.ddqSafeInsets, targertView: self.view)
+                make.ddqInsets(insets: ddqSafeInsets, targertView: view)
             }
         }
     }
     
-    open func ddqTableViewStyle() -> DDQViewControllerTableStyle {
+    open func ddqTableViewStyle() -> TableStyle {
         .none
     }
         
     open func ddqControllerInitialize() {
         
-        self.hidesBottomBarWhenPushed = true
+        hidesBottomBarWhenPushed = true
         let style = ddqTableViewStyle()
         
         if style != .none {
@@ -85,13 +85,13 @@ open class DDQViewController: UIViewController {
                     break
             }
             
-            self.tableView = .ddqTableView(style: tableStyle!)
+            tableView = .ddqTableView(style: tableStyle!)
         }
     }
     
     open func ddqConfigSubviews() {
-        if let tableView = self.tableView {
-            self.view.ddqAddSubViews(subViews: [tableView])
+        if let tableView = tableView {
+            view.ddqAddSubViews(subViews: [tableView])
         }
     }
         

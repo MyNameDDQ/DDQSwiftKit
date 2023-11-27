@@ -12,7 +12,7 @@ import SAMKeychain
 
 public extension String {
     func ddqTrimmingWhitespacesAndNewlines() -> String {
-        self.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+        trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
     }
     
     func ddqHTMLTextToAttributedString(dic: [NSAttributedString.Key: Any]? = nil) -> NSAttributedString? {
@@ -20,7 +20,7 @@ public extension String {
         var attributedString: NSAttributedString?
         
         do {
-            if let data = self.ddqToData() {
+            if let data = ddqToData() {
                 
                 let html = try NSAttributedString.init(data: data, options: [NSAttributedString.DocumentReadingOptionKey.documentType: NSAttributedString.DocumentType.html], documentAttributes: nil).mutableCopy() as? NSMutableAttributedString
                 
@@ -40,7 +40,7 @@ public extension String {
     }
     
     var ddqLength: Int {
-        self.indices.count
+        indices.count
     }
     
     func ddqSize(attributes: [NSAttributedString.Key: Any]? = nil) -> CGSize {
@@ -51,9 +51,9 @@ public extension String {
     }
     
     func ddqRemoveDuplicates() -> String {
-        self.enumerated().filter { element in
+        enumerated().filter { element in
             
-            let index = self.firstIndex(of: element.element)
+            let index = firstIndex(of: element.element)
             return index?.utf16Offset(in: self) == element.offset
             
         }.map { $0.element }.ddqToString()
@@ -67,12 +67,12 @@ public extension String {
         let start = range.startIndex
         let end = range.endIndex
         
-        if start > self.count || end > self.count {
+        if start > count || end > count {
             return ""
         }
         
-        let s = self.index(.init(utf16Offset: start, in: self), offsetBy: 0)
-        let e = self.index(.init(utf16Offset: end, in: self), offsetBy: 0)
+        let s = index(.init(utf16Offset: start, in: self), offsetBy: 0)
+        let e = index(.init(utf16Offset: end, in: self), offsetBy: 0)
         return String(self[s..<e])
     }
     
@@ -81,17 +81,17 @@ public extension String {
     }
     
     func ddqSubString(from: Int) -> String {
-        ddqSubString(from..<self.count)
+        ddqSubString(from..<count)
     }
     
     func ddqComponents(separtor: String = "") -> [String] {
         if separtor != "" {
-            return self.components(separatedBy: separtor)
+            return components(separatedBy: separtor)
         }
         
         var components: [String] = []
         
-        self.forEach { char in
+        forEach { char in
             components.ddqAdd(String(char))
         }
         
@@ -105,8 +105,11 @@ public extension String {
 public extension String {
     enum DDQTimeStampType {
         
+        /// 秒
         case second
+        /// 毫秒
         case millisecond
+        /// 微秒
         case microsecond
     }
 
@@ -125,7 +128,7 @@ public extension String {
         
     func ddqToDateString(formatter: String? = nil) -> String {
         
-        let date = Date(timeIntervalSince1970: self.ddqToDouble())
+        let date = Date(timeIntervalSince1970: ddqToDouble())
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = formatter ?? "yyyy-MM-dd HH:mm:ss"
         return dateFormatter.string(from: date)
@@ -243,11 +246,11 @@ public extension String {
     }
         
     func ddqValidateNewestAppVersion(version: String) -> Bool {
-        if self.isEmpty || version.isEmpty {
+        if isEmpty || version.isEmpty {
             return false
         }
         
-        let current: [String] = self.components(separatedBy: ".")
+        let current: [String] = components(separatedBy: ".")
     
         guard !current.isEmpty else {
             return false
@@ -519,7 +522,7 @@ public extension String {
         
         let filter = CIFilter.init(name: "CIQRCodeGenerator")
         filter?.setDefaults()
-        let data = self.data(using: Encoding.utf8)
+        let data = data(using: Encoding.utf8)
         filter?.setValue(data ?? Data(), forKey: "inputMessage")
         filter?.setValue("H", forKey: "inputCorrectionLevel")
         let ciImage = filter?.outputImage
@@ -532,7 +535,7 @@ public extension String {
     }
         
     func ddqBase64ToImage() -> UIImage? {
-        if let data = self.ddqBase64StringToData() {
+        if let data = ddqBase64StringToData() {
             return UIImage.init(data: data)
         }
     

@@ -26,7 +26,7 @@ open class DDQViewModel: NSObject {
     }
     
     open func ddqRemoveObserver() {
-        self.observers.enumerated().forEach { objc in
+        observers.enumerated().forEach { objc in
             ddqNotificationCenter.removeObserver(objc)
         }
     }
@@ -47,6 +47,6 @@ open class DDQViewModel: NSObject {
             }
         }
         
-        self.observers.append(observer)
+        observers.append(observer)
     }
 }

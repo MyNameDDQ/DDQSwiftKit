@@ -7,25 +7,23 @@
 
 import UIKit
 
-public struct DDQLayoutCenterOffset {
-    
-    public var xOffset: CGFloat
-    public var yOffset: CGFloat
-    
-    public init(xOffset: CGFloat, yOffset: CGFloat) {
-        self.xOffset = xOffset
-        self.yOffset = yOffset
-    }
-}
-
-public extension DDQLayoutCenterOffset {
-    static var zero: DDQLayoutCenterOffset {
-        return DDQLayoutCenterOffset(xOffset: 0.0, yOffset: 0.0)
-    }
-}
-
 open class DDQLayoutMake {
-    public enum DDQLayoutDirection: Int {
+    public struct CenterOffset {
+        
+        public var xOffset: CGFloat
+        public var yOffset: CGFloat
+        
+        public static var zero: CenterOffset {
+            return .init(xOffset: 0.0, yOffset: 0.0)
+        }
+        
+        public init(xOffset: CGFloat, yOffset: CGFloat) {
+            self.xOffset = xOffset
+            self.yOffset = yOffset
+        }
+    }
+
+    public enum Direction {
         
         case none
         case topToBottom
@@ -37,7 +35,7 @@ open class DDQLayoutMake {
         case centerY
     }
         
-    private enum DDQLayoutType: Int {
+    private enum LayoutType {
         
         case top
         case left
@@ -49,8 +47,8 @@ open class DDQLayoutMake {
     }
     
     private(set) var view: UIView?
-    private(set) var horDirection: DDQLayoutDirection = .none
-    private(set) var verDirection: DDQLayoutDirection = .none
+    private(set) var horDirection: Direction = .none
+    private(set) var verDirection: Direction = .none
     private var origin: CGPoint = .zero
 
     public convenience init(view: UIView) {
@@ -61,48 +59,48 @@ open class DDQLayoutMake {
     
     open func ddqTop(property: DDQLayoutProperty, value: CGFloat) -> Self {
         
-        self._handleInstallPoint(type: .top, property: property, value: value, offset: .zero)
+        _handleInstallPoint(type: .top, property: property, value: value, offset: .zero)
         return self
     }
     
     open func ddqLeft(property: DDQLayoutProperty, value: CGFloat) -> Self {
         
-        self._handleInstallPoint(type: .left, property: property, value: value, offset: .zero)
+        _handleInstallPoint(type: .left, property: property, value: value, offset: .zero)
         return self
     }
 
     open func ddqBottom(property: DDQLayoutProperty, value: CGFloat) -> Self {
         
-        self._handleInstallPoint(type: .bottom, property: property, value: value, offset: .zero)
+        _handleInstallPoint(type: .bottom, property: property, value: value, offset: .zero)
         return self
     }
 
     open func ddqRight(property: DDQLayoutProperty, value: CGFloat) -> Self {
         
-        self._handleInstallPoint(type: .right, property: property, value: value, offset: .zero)
+        _handleInstallPoint(type: .right, property: property, value: value, offset: .zero)
         return self
     }
 
-    open func ddqCenter(property: DDQLayoutProperty, offset: DDQLayoutCenterOffset) -> Self {
+    open func ddqCenter(property: DDQLayoutProperty, offset: CenterOffset) -> Self {
 
-        self._handleInstallPoint(type: .center, property: property, value: 0.0, offset: offset)
+        _handleInstallPoint(type: .center, property: property, value: 0.0, offset: offset)
         return self
     }
 
     open func ddqCenterX(property: DDQLayoutProperty, value: CGFloat) -> Self {
         
-        self._handleInstallPoint(type: .centerX, property: property, value: value, offset: .zero)
+        _handleInstallPoint(type: .centerX, property: property, value: value, offset: .zero)
         return self
     }
     
     open func ddqCenterY(property: DDQLayoutProperty, value: CGFloat) -> Self {
         
-        self._handleInstallPoint(type: .centerY, property: property, value: value, offset: .zero)
+        _handleInstallPoint(type: .centerY, property: property, value: value, offset: .zero)
         return self
     }
     
     open func ddqSize(size: CGSize) {
-        self._handleInstallSize(size: size)
+        _handleInstallSize(size: size)
     }
     
     open func ddqSize(size: CGSize, scale: CGFloat) {
@@ -111,8 +109,8 @@ open class DDQLayoutMake {
     
     open func ddqSizeToFit() {
         
-        self.view?.sizeToFit()
-        ddqSize(size: self.view?.ddqSize ?? .zero)
+        view?.sizeToFit()
+        ddqSize(size: view?.ddqSize ?? .zero)
     }
 
     open func ddqSizeThatFits(size: CGSize) {
@@ -121,81 +119,81 @@ open class DDQLayoutMake {
     
     open func ddqSizeThatFits(size: CGSize, scale: CGFloat) {
         
-        let fitSize = self.view?.sizeThatFits(size)
+        let fitSize = view?.sizeThatFits(size)
         ddqSize(size: CGSize(width: (fitSize?.width ?? 0.0) * scale, height: (fitSize?.height ?? 0.0) * scale))
     }
         
     open func ddqWidth(width: CGFloat) {
-        ddqSize(size: CGSize(width: width, height: self.view?.ddqHeight ?? 0.0))
+        ddqSize(size: CGSize(width: width, height: view?.ddqHeight ?? 0.0))
     }
     
     open func ddqHeight(height: CGFloat) {
-        ddqSize(size: CGSize(width: self.view?.ddqWidth ?? 0, height: height))
+        ddqSize(size: CGSize(width: view?.ddqWidth ?? 0, height: height))
     }
 
     open func ddqInsets(insets: UIEdgeInsets, targertView: UIView?) {
         
-        let view = targertView ?? self.view?.superview
+        let view = targertView ?? view?.superview
         
         guard view != nil else {
             return
         }
         
         let size: CGSize = .init(width: view!.ddqWidth - insets.left - insets.right, height: view!.ddqHeight - insets.top - insets.bottom)
-        self.ddqLeft(property: view!.ddqLeft, value: insets.left).ddqTop(property: view!.ddqTop, value: insets.top).ddqSize(size: size)
+        ddqLeft(property: view!.ddqLeft, value: insets.left).ddqTop(property: view!.ddqTop, value: insets.top).ddqSize(size: size)
     }
         
     open func ddqUpdate() {
-        self.ddqSize(size: self.view?.ddqSize ?? CGSize.zero)
+        ddqSize(size: view?.ddqSize ?? CGSize.zero)
     }
     
-    private func _handleInstallPoint(type: DDQLayoutType, property: DDQLayoutProperty, value: CGFloat, offset: DDQLayoutCenterOffset) {
-        guard self.view != nil else {
+    private func _handleInstallPoint(type: LayoutType, property: DDQLayoutProperty, value: CGFloat, offset: CenterOffset) {
+        guard view != nil else {
             return
         }
         
-        var frame = self.view!.frame
-        let propertyValue = self._getValueWithProperty(property: property)
+        var frame = view!.frame
+        let propertyValue = _getValueWithProperty(property: property)
         let value = propertyValue + value
         
         switch type {
             case .top:
-                self.verDirection = .topToBottom
+                verDirection = .topToBottom
                 frame.origin.y = value
                 
             case .left:
-                self.horDirection = .leftToRight
+                horDirection = .leftToRight
                 frame.origin.x = value
                 
             case .bottom:
-                self.verDirection = .bottomToTop
+                verDirection = .bottomToTop
                 frame.origin.y = value
                 
             case .right:
-                self.horDirection = .rightToLeft
+                horDirection = .rightToLeft
                 frame.origin.x = value
                 
             case .centerX:
-                self.horDirection = .centerX
+                horDirection = .centerX
                 frame.origin.x = value
 
             case .centerY:
-                self.verDirection = .centerY
+                verDirection = .centerY
                 frame.origin.y = value
                 
             case .center:
-                self.horDirection = .center
-                self.verDirection = .center
+                horDirection = .center
+                verDirection = .center
                 
                 let layoutView = property.layoutView
-                let isSuper = self.view?.superview == layoutView
+                let isSuper = view?.superview == layoutView
                 let x = isSuper ? layoutView.ddqBoundsMidX : layoutView.ddqMidX
                 let y = isSuper ? layoutView.ddqBoundsMidY : layoutView.ddqMidY
                 frame.origin = CGPoint(x: x + offset.xOffset, y: y + offset.yOffset)
         }
         
-        self.origin = frame.origin
-        self.view!.frame = frame
+        origin = frame.origin
+        view!.frame = frame
     }
     
     private func _getValueWithProperty(property: DDQLayoutProperty?) -> CGFloat {
@@ -205,7 +203,7 @@ open class DDQLayoutMake {
         
         var value: CGFloat = 0.0
         let layoutView = property!.layoutView
-        let isSuper = layoutView == self.view?.superview
+        let isSuper = layoutView == view?.superview
         
         switch property?.aligment {
             case .top:
@@ -234,14 +232,14 @@ open class DDQLayoutMake {
     }
     
     private func _handleInstallSize(size: CGSize) {
-        guard self.view != nil else {
+        guard view != nil else {
             return
         }
         
-        var newX = self.origin.x
-        var newY = self.origin.y
+        var newX = origin.x
+        var newY = origin.y
         
-        switch self.horDirection {
+        switch horDirection {
             case .rightToLeft:
                 newX -= size.width
 
@@ -255,7 +253,7 @@ open class DDQLayoutMake {
                 break
         }
         
-        switch self.verDirection {
+        switch verDirection {
             case .bottomToTop:
                 newY -= size.height
 
@@ -269,10 +267,10 @@ open class DDQLayoutMake {
                 break
         }
         
-        var frame = self.view!.frame
+        var frame = view!.frame
         frame.origin = CGPoint(x: newX, y: newY)
         frame.size = size
-        self.view!.frame = frame
+        view!.frame = frame
     }
 }
 

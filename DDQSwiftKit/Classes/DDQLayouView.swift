@@ -7,33 +7,32 @@
 
 import UIKit
 
-public struct DDQBasalLayoutScale {
-    
-    /// 定宽
-    public var fixledWidth: CGFloat
-    
-    /// 宽高比
-    public var scale: CGFloat
-    
-    /// 不使用比例
-    public static let defaultScale: CGFloat = -1.0
-    
-    public init(fixledWidth: CGFloat, scale: CGFloat = defaultScale) {
-        self.fixledWidth = fixledWidth
-        self.scale = scale
-    }
-}
-
-public extension DDQBasalLayoutScale {
-    static var normal: DDQBasalLayoutScale {
-        get {
-            .init(fixledWidth: 0.0)
+open class DDQLayoutView: DDQView {
+    public struct LayoutScale {
+        
+        /// 定宽
+        public var fixledWidth: CGFloat
+        
+        /// 宽高比
+        public var scale: CGFloat
+        
+        /// 不使用比例
+        public static let defaultScale: CGFloat = -1.0
+        
+        public static var normal: LayoutScale {
+            get {
+                .init(fixledWidth: 0.0)
+            }
+        }
+        
+        public init(fixledWidth: CGFloat, scale: CGFloat = defaultScale) {
+            
+            self.fixledWidth = fixledWidth
+            self.scale = scale
         }
     }
-}
 
-open class DDQBasalLayoutView: DDQView {
-    public enum DDQBasalLayoutAlignment: Int {
+    public enum Alignment {
 
         case top
         case left
@@ -46,13 +45,13 @@ open class DDQBasalLayoutView: DDQView {
      布局时对齐方式
      默认top
      */
-    open var alignment: DDQBasalLayoutAlignment = .top {
+    open var alignment: Alignment = .top {
         didSet {
-            self.ddqSetNeedsLayout()
+            ddqSetNeedsLayout()
         }
     }
 
-    public enum DDQBasalLayoutDirection: Int {
+    public enum Direction {
 
         case vertical
         case horizontal
@@ -62,13 +61,13 @@ open class DDQBasalLayoutView: DDQView {
      布局时方向
      默认vertical
      */
-    open var direction: DDQBasalLayoutDirection = .vertical {
+    open var direction: Direction = .vertical {
         didSet {
-            self.ddqSetNeedsLayout()
+            ddqSetNeedsLayout()
         }
     }
 
-    public enum DDQBasalLayoutFixled: Int {
+    public enum Fixled {
 
         case width
         case height
@@ -77,44 +76,44 @@ open class DDQBasalLayoutView: DDQView {
     /**
      布局时定宽还是定高
      */
-    open var fixled: DDQBasalLayoutFixled = .width {
+    open var fixled: Fixled = .width {
         didSet {
-            self.ddqSetNeedsLayout()
+            ddqSetNeedsLayout()
         }
     }
 
     open var mainView: UIView? {
         willSet {
-            self.mainView?.removeFromSuperview()
+            mainView?.removeFromSuperview()
         }
 
         didSet {
-            if let mainView = self.mainView {
-                self.addSubview(mainView)
+            if let mainView = mainView {
+                addSubview(mainView)
             }
         }
     }
 
     open var subView: UIView? {
         willSet {
-            self.subView?.removeFromSuperview()
+            subView?.removeFromSuperview()
         }
 
         didSet {
-            if let subView = self.subView {
-                self.addSubview(subView)
+            if let subView = subView {
+                addSubview(subView)
             }
         }
     }
 
     open var backgroundView: UIView? {
         willSet {
-            self.backgroundView?.removeFromSuperview()
+            backgroundView?.removeFromSuperview()
         }
 
         didSet {
-            if let backgroundView = self.backgroundView {
-                self.insertSubview(backgroundView, at: 0)
+            if let backgroundView = backgroundView {
+                insertSubview(backgroundView, at: 0)
             }
         }
     }
@@ -122,32 +121,32 @@ open class DDQBasalLayoutView: DDQView {
     /**
     主视图在布局时的比例
      */
-    open var mainScale: DDQBasalLayoutScale = .normal {
+    open var mainScale: LayoutScale = .normal {
         didSet {
-            self.ddqSetNeedsLayout()
+            ddqSetNeedsLayout()
         }
     }
     
     /**
      子视图布局时的比例
      */
-    open var subScale: DDQBasalLayoutScale = .normal {
+    open var subScale: LayoutScale = .normal {
         didSet {
-            self.ddqSetNeedsLayout()
+            ddqSetNeedsLayout()
         }
     }
 
     // 主视图的布局边界
     open var edges: UIEdgeInsets = .zero {
         didSet {
-            self.ddqSetNeedsLayout()
+            ddqSetNeedsLayout()
         }
     }
 
     // 副视图的布局边界
     open var spacings: UIEdgeInsets = .zero {
         didSet {
-            self.ddqSetNeedsLayout()
+            ddqSetNeedsLayout()
         }
     }
 
@@ -156,39 +155,33 @@ open class DDQBasalLayoutView: DDQView {
         self.init()
         self.mainView = mainView
         self.subView = subView
-
-        if let main = self.mainView {
-            self.addSubview(main)
-        }
-
-        if let sub = self.subView {
-            self.addSubview(sub)
-        }
+        addSubview(mainView)
+        addSubview(subView)
     }
 
     open override func ddqViewInitialize() {
 
         super.ddqViewInitialize()
 
-        if let background = self.backgroundView {
-            self.ddqAddSubViews(subViews: [background])
+        if let background = backgroundView {
+            ddqAddSubViews(subViews: [background])
         }
     }
 
     open override func sizeToFit() {
 
         super.sizeToFit()
-        let fitSize = self.sizeThatFits(CGSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude))
-        self.frame = .init(origin: .zero, size: fitSize)
+        let fitSize = sizeThatFits(CGSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude))
+        frame = .init(origin: .zero, size: fitSize)
     }
 
     open override func sizeThatFits(_ size: CGSize) -> CGSize {
 
         super.sizeThatFits(size)
-        self.fitSize = size
-        self.isSizeThatFit = true
-        self.ddqLayoutSubviews(size: size)
-        return self.sizeToFitFrame.size
+        fitSize = size
+        isSizeThatFit = true
+        ddqLayoutSubviews(size: size)
+        return sizeToFitFrame.size
     }
 
     open func sizeThatFitsInWidth(w: CGFloat) -> CGSize {
@@ -211,28 +204,28 @@ open class DDQBasalLayoutView: DDQView {
 
         super.ddqLayoutSubviews(size: size)
         
-        guard let mainV = self.mainView else { return }
+        guard let mainV = mainView else { return }
 
-        guard let subV = self.subView else { return }
+        guard let subV = subView else { return }
 
-        if let backgroundView = self.backgroundView {
+        if let backgroundView = backgroundView {
             backgroundView.frame.size = size
         }
 
-        let _insets = self.edges
-        let _spacings = self.spacings
-        let _alignment = self.alignment
-        let _direction = self.direction
+        let _insets = edges
+        let _spacings = spacings
+        let _alignment = alignment
+        let _direction = direction
         
         var mainSize: CGSize = .zero
         var subSize: CGSize = .zero
         var boundRect: CGRect = .zero
                     
-        let _fixled = self.fixled
+        let _fixled = fixled
         var boundSize = size
         
-        if self.isSizeThatFit {
-            boundSize = self.fitSize
+        if isSizeThatFit {
+            boundSize = fitSize
         }
 
         var layoutW = boundSize.width - _insets.left - _insets.right
@@ -241,32 +234,32 @@ open class DDQBasalLayoutView: DDQView {
         var mainFitH = 0.0
         var subFitW = 0.0
         var subFitH = 0.0
-        let mainIsFixled = self.mainScale.fixledWidth > 0
-        let subIsFixled = self.subScale.fixledWidth > 0
-        let mainUseScale = self.mainScale.scale != DDQBasalLayoutScale.defaultScale
-        let subUseScale = self.subScale.scale != DDQBasalLayoutScale.defaultScale
+        let mainIsFixled = mainScale.fixledWidth > 0
+        let subIsFixled = subScale.fixledWidth > 0
+        let mainUseScale = mainScale.scale != LayoutScale.defaultScale
+        let subUseScale = subScale.scale != LayoutScale.defaultScale
         
         if _fixled == .width {
             if _direction == .horizontal {
                 layoutW -= _spacings.left
             }
             
-            mainFitW = mainIsFixled ? self.mainScale.fixledWidth : layoutW
-            subFitW = subIsFixled ? self.subScale.fixledWidth : layoutW
+            mainFitW = mainIsFixled ? mainScale.fixledWidth : layoutW
+            subFitW = subIsFixled ? subScale.fixledWidth : layoutW
 
-            mainFitH = mainUseScale ? mainFitW * self.mainScale.scale : .greatestFiniteMagnitude
-            subFitH = subUseScale ? subFitW * self.subScale.scale : .greatestFiniteMagnitude
+            mainFitH = mainUseScale ? mainFitW * mainScale.scale : .greatestFiniteMagnitude
+            subFitH = subUseScale ? subFitW * subScale.scale : .greatestFiniteMagnitude
 
         } else {
             if _direction == .vertical {
                 layoutH -= _spacings.top
             }
             
-            mainFitW = mainIsFixled ? self.mainScale.fixledWidth : .greatestFiniteMagnitude
-            subFitW = subIsFixled ? self.subScale.fixledWidth : .greatestFiniteMagnitude
+            mainFitW = mainIsFixled ? mainScale.fixledWidth : .greatestFiniteMagnitude
+            subFitW = subIsFixled ? subScale.fixledWidth : .greatestFiniteMagnitude
 
-            mainFitH = mainUseScale ? mainFitW * self.mainScale.scale : layoutH
-            subFitH = subUseScale ? subFitW * self.subScale.scale : layoutH
+            mainFitH = mainUseScale ? mainFitW * mainScale.scale : layoutH
+            subFitH = subUseScale ? subFitW * subScale.scale : layoutH
         }
         
         let mainFitSize: CGSize = .init(width: mainFitW, height: mainFitH)
@@ -283,7 +276,7 @@ open class DDQBasalLayoutView: DDQView {
             boundRect.size = .init(width: _insets.left + mainSize.width + _spacings.left + subSize.width + _insets.right, height: _insets.top + maxH + _insets.bottom)
         }
         
-        self.sizeToFitFrame = boundRect
+        sizeToFitFrame = boundRect
         let view: UIView = .init(frame: boundRect)
         
         if _direction == .vertical {

@@ -13,7 +13,7 @@ import YYKit
  view初始化
  */
 public extension UIView {
-    class func ddqView(backgroundColor: UIColor = .ddqBackgroundColor()) -> UIView {
+    static func ddqView(backgroundColor: UIColor = .ddqBackgroundColor()) -> UIView {
         
         let view = self.init(frame: .zero)
         view.backgroundColor = backgroundColor
@@ -26,7 +26,7 @@ public extension UIView {
  label初始化
  */
 public extension UILabel {
-    class func ddqLabel(text: String? = nil, font: UIFont? = nil, textColor: UIColor? = nil) -> UILabel {
+    static func ddqLabel(text: String? = nil, font: UIFont? = nil, textColor: UIColor? = nil) -> UILabel {
         
         let label = UILabel()
         label.isUserInteractionEnabled = true
@@ -50,7 +50,7 @@ public extension UILabel {
         return label
     }
     
-    class func ddqAttributedLabel(text: String, attributes: [NSAttributedString.Key: Any]? = nil) -> UILabel {
+    static func ddqAttributedLabel(text: String, attributes: [NSAttributedString.Key: Any]? = nil) -> UILabel {
         
         let label = ddqLabel()
         let attributedText = NSAttributedString.init(string: text, attributes: attributes ?? ddqAttributes())
@@ -66,7 +66,7 @@ public extension UIButton {
     
     typealias DDQButtonActionBlock = (_ button: UIButton) -> Void
     
-    class func ddqButton(title: String? = nil, image: UIImage? = nil, backgroundImage: UIImage? = nil, titleColor: UIColor? = nil, event: UIButton.Event = .touchUpInside, action: DDQButtonActionBlock? = nil) -> UIButton {
+    static func ddqButton(title: String? = nil, image: UIImage? = nil, backgroundImage: UIImage? = nil, titleColor: UIColor? = nil, event: UIButton.Event = .touchUpInside, action: DDQButtonActionBlock? = nil) -> UIButton {
         
         let button = UIButton.init(type: .custom)
         button.backgroundColor = .clear
@@ -98,7 +98,7 @@ public extension UIButton {
         return button
     }
 
-    class func ddqButton(title: String? = nil, image: UIImage? = nil, backgroundImage: UIImage? = nil, titleColor: UIColor? = nil, event: UIButton.Event = .touchUpInside, target: Any, selector: Selector) -> UIButton {
+    static func ddqButton(title: String? = nil, image: UIImage? = nil, backgroundImage: UIImage? = nil, titleColor: UIColor? = nil, event: UIButton.Event = .touchUpInside, target: Any, selector: Selector) -> UIButton {
         
         let button = ddqButton(title: title, image: image, backgroundImage: backgroundImage, titleColor: titleColor, event: event)
         button.addTarget(target, action: selector, for: event)
@@ -110,7 +110,7 @@ public extension UIButton {
  textField初始化
  */
 public extension UITextField {
-    class func ddqTextField(placeholder: String? = nil, placeholderAttrs: [NSAttributedString.Key: Any]? = nil, font: UIFont = .ddqFont(), textColor: UIColor = .ddqTextColor(), delegate: UITextFieldDelegate? = nil) -> UITextField {
+    static func ddqTextField(placeholder: String? = nil, placeholderAttrs: [NSAttributedString.Key: Any]? = nil, font: UIFont = .ddqFont(), textColor: UIColor = .ddqTextColor(), delegate: UITextFieldDelegate? = nil) -> UITextField {
         
         let textField = UITextField()
         textField.borderStyle = .roundedRect
@@ -138,7 +138,7 @@ public extension UITextField {
  image初始化
  */
 public extension UIImageView {
-    class func ddqImageView(imageName: String? = nil, image: UIImage? = nil) -> UIImageView {
+    static func ddqImageView(imageName: String? = nil, image: UIImage? = nil) -> UIImageView {
         
         let imageView = UIImageView()
         imageView.isUserInteractionEnabled = true
@@ -157,7 +157,7 @@ public extension UIImageView {
         return imageView
     }
     
-    class func ddqImageView(imageUrl: String?, placeholderName: String?) -> UIImageView {
+    static func ddqImageView(imageUrl: String?, placeholderName: String?) -> UIImageView {
         
         let imageView = ddqImageView()
         
@@ -169,7 +169,7 @@ public extension UIImageView {
         return imageView
     }
     
-    class func ddqImageView(gif images: [Any]?) -> UIImageView {
+    static func ddqImageView(gif images: [Any]?) -> UIImageView {
         
         let imageView = ddqImageView()
         
@@ -200,11 +200,11 @@ public extension UIImageView {
     }
     
     func ddqWithRendering(rendering: UIImage.RenderingMode) -> UIImageView {
-        guard self.image != nil else {
+        guard image != nil else {
             return self
         }
         
-        let image = self.image?.withRenderingMode(rendering)
+        let image = image?.withRenderingMode(rendering)
         self.image = image
         return self
     }
@@ -214,7 +214,7 @@ public extension UIImageView {
  scrollView初始化
  */
 public extension UIScrollView {
-    class func ddqScrollView() -> UIScrollView {
+    static func ddqScrollView() -> UIScrollView {
         
         let scrollView = UIScrollView(frame: CGRect.zero)
         
@@ -233,7 +233,7 @@ public extension UIScrollView {
  tableView初始化
  */
 public extension UITableView {
-    class func ddqTableView(style: Style = .grouped, delegate: UITableViewDelegate? = nil, dataSource: UITableViewDataSource? = nil) -> UITableView {
+    static func ddqTableView(style: Style = .grouped, delegate: UITableViewDelegate? = nil, dataSource: UITableViewDataSource? = nil) -> UITableView {
         
         let tableView = UITableView.init(frame: CGRect.zero, style: style)
         tableView.sectionHeaderHeight = 0
@@ -243,14 +243,7 @@ public extension UITableView {
         tableView.showsVerticalScrollIndicator = false
         tableView.showsHorizontalScrollIndicator = false
         tableView.separatorStyle = .none
-        
-        if let d = delegate {
-            tableView.delegate = d
-        }
-        
-        if let s = dataSource {
-            tableView.dataSource = s
-        }
+        tableView.ddqSet(delegate: delegate, dataSource: dataSource)
         
         if #available(iOS 11.0, *) {
             tableView.contentInsetAdjustmentBehavior = .never
@@ -259,13 +252,23 @@ public extension UITableView {
         tableView.backgroundColor = .ddqBackgroundColor()
         return tableView
     }
+    
+    func ddqSet(delegate: UITableViewDelegate? = nil, dataSource: UITableViewDataSource? = nil) {
+        if let d = delegate {
+            self.delegate = d
+        }
+        
+        if let s = dataSource {
+            self.dataSource = s
+        }
+    }
 }
 
 /**
  collectionView初始化
  */
 public extension UICollectionView {
-    class func ddqDefaultFlowLayout() -> UICollectionViewFlowLayout {
+    static func ddqDefaultFlowLayout() -> UICollectionViewFlowLayout {
         
         let flowLayout = UICollectionViewFlowLayout.init()
         flowLayout.minimumLineSpacing = 0
@@ -274,25 +277,32 @@ public extension UICollectionView {
         return flowLayout
     }
     
-    class func ddqCollectionView(flowLayout: UICollectionViewFlowLayout? = nil, delegate: UICollectionViewDelegate? = nil, dataSource: UICollectionViewDataSource? = nil) -> UICollectionView {
+    static func ddqCollectionView(flowLayout: UICollectionViewFlowLayout? = nil, delegate: UICollectionViewDelegate? = nil, dataSource: UICollectionViewDataSource? = nil) -> UICollectionView {
         
         let collectionView = UICollectionView.init(frame: CGRect.zero, collectionViewLayout: flowLayout ?? ddqDefaultFlowLayout())
         collectionView.showsVerticalScrollIndicator = false
         collectionView.showsHorizontalScrollIndicator = false
-        
-        if let d = delegate {
-            collectionView.delegate = d
-        }
-        
-        if let s = dataSource {
-            collectionView.dataSource = s
-        }
+        collectionView.ddqSet(delegate: delegate, dataSource: dataSource)
         
         if #available(iOS 11.0, *) {
             collectionView.contentInsetAdjustmentBehavior = UIScrollView.ContentInsetAdjustmentBehavior.never
         }
 
         return collectionView
+    }
+    
+    func ddqSet(delegate: UICollectionViewDelegate? = nil, dataSource: UICollectionViewDataSource? = nil, flowLayout: UICollectionViewLayout? = nil) {
+        if let d = delegate {
+            self.delegate = d
+        }
+        
+        if let f = flowLayout {
+            collectionViewLayout = f
+        }
+                
+        if let s = dataSource {
+            self.dataSource = s
+        }
     }
 }
 
@@ -301,10 +311,10 @@ public extension UICollectionView {
  */
 public extension UITextView {
     var ddqBeginningRect: CGRect {
-        return self.caretRect(for: self.beginningOfDocument)
+        return caretRect(for: beginningOfDocument)
     }
     
-    class func ddqTextView(font: UIFont = .ddqFont(), textColor: UIColor = .ddqTextColor(), delegate: UITextViewDelegate? = nil, container: NSTextContainer? = nil) -> UITextView {
+    static func ddqTextView(font: UIFont = .ddqFont(), textColor: UIColor = .ddqTextColor(), delegate: UITextViewDelegate? = nil, container: NSTextContainer? = nil) -> UITextView {
         
         let textView: UITextView
         

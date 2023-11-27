@@ -13,12 +13,12 @@ public extension Dictionary where Key == String {
         JSON.init(self)
     }
     
-    func ddqArrayFor(_ key: String) -> [JSON] {
-        _toJson()[key].arrayValue
+    func ddqArrayFor(_ key: String) -> [Any] {
+        _toJson()[key].arrayObject ?? []
     }
     
-    func ddqDictionaryFor(_ key: String) -> [String: JSON] {
-        _toJson()[key].dictionaryValue
+    func ddqDictionaryFor(_ key: String) -> [String: Any] {
+        _toJson()[key].dictionaryObject ?? [:]
     }
 
     func ddqStringFor(_ key: String) -> String {
@@ -57,18 +57,34 @@ public extension Dictionary {
     ///   - other: 新字典
     ///   - update: 字段冲突时，是否用other提供的数据更新
     mutating func ddqAddEntries(_ other: [Key: Value], update: Bool = true) {
-        self.merge(other) { current, new in update ? new : current }
+        merge(other) { current, new in update ? new : current }
     }
     
     mutating func ddqRemoveForKeys(_ keys: [AnyHashable]) {
         for key in keys {
-            self.removeValue(forKey: key as! Key)
+            removeValue(forKey: key as! Key)
         }
+    }
+    
+    func ddqDictionaryForKeys(_ keys: [Key]) -> [Key: Value] {
+        if isEmpty {
+            return [:]
+        }
+        
+        var dic: [Key: Value] = .init()
+        
+        for key in keys {
+            if let value = self[key] {
+                dic.updateValue(value, forKey: key)
+            }
+        }
+        
+        return dic
     }
 }
 
 public extension Dictionary where Key: Comparable {
     func ddqSortedKeys(_ ascending: Bool = true) -> [Key] {
-        self.keys.map { $0 }.ddqSortedArray(ascending: ascending)
+        keys.map { $0 }.ddqSortedArray(ascending: ascending)
     }
 }

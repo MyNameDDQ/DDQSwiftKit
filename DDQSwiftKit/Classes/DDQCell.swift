@@ -7,25 +7,23 @@
 
 import UIKit
 
-public struct DDQCellSeparatorMargin {
-    
-    public var left: CGFloat
-    public var right: CGFloat
-    
-    public init(left: CGFloat, right: CGFloat) {
-        self.left = left
-        self.right = right
-    }
-}
-
-public extension DDQCellSeparatorMargin {
-    static var zero: DDQCellSeparatorMargin {
-        return DDQCellSeparatorMargin(left: 0.0, right: 0.0)
-    }
-}
-
 open class DDQCell: UITableViewCell {
-    public enum DDQCellSeparatorStyle {
+    public struct SeparatorMargin {
+        
+        public var left: CGFloat
+        public var right: CGFloat
+        
+        public static var zero: SeparatorMargin {
+            return .init(left: 0.0, right: 0.0)
+        }
+        
+        public init(left: CGFloat, right: CGFloat) {
+            self.left = left
+            self.right = right
+        }
+    }
+
+    public enum SeparatorStyle {
         
         case none
         case top
@@ -34,36 +32,36 @@ open class DDQCell: UITableViewCell {
 
     private var ddqSeparator: UIView = UIView(frame: CGRect.zero)
     
-    open var ddqCellDataSource: DDQCellModel? {
+    open var ddqDataSource: DDQCellModel? {
         didSet {
             
-            self.ddqCellDidUpdateData()
-            self.ddqCellLayoutSubviews(size: self.contentView.ddqSize)
-            self.ddqCellSetNeedsLayout()
+            ddqCellDidUpdateData()
+            ddqCellLayoutSubviews(size: contentView.ddqSize)
+            ddqCellSetNeedsLayout()
         }
     }
     
-    open var ddqSeparatorStyle: DDQCellSeparatorStyle = .none {
+    open var ddqSeparatorStyle: SeparatorStyle = .none {
         didSet {
-            self.ddqCellSetNeedsLayout()
+            ddqCellSetNeedsLayout()
         }
     }
     
-    open var ddqSeparatorMargin: DDQCellSeparatorMargin = .zero {
+    open var ddqSeparatorMargin: SeparatorMargin = .zero {
         didSet {
-            self.ddqCellSetNeedsLayout()
+            ddqCellSetNeedsLayout()
         }
     }
     
     open var ddqSeparatorColor: UIColor = .ddqSeparatorColor() {
         didSet {
-            self.ddqSeparator.backgroundColor = self.ddqSeparatorColor
+            ddqSeparator.backgroundColor = ddqSeparatorColor
         }
     }
     
     open var ddqSeparatorHeight: CGFloat = 1.0 {
         didSet {
-            self.ddqCellSetNeedsLayout()
+            ddqCellSetNeedsLayout()
         }
     }
         
@@ -76,21 +74,21 @@ open class DDQCell: UITableViewCell {
     
     open func ddqCellInitialize() {
         
-        self.ddqIsInitialize = true
-        self.contentView.addSubview(self.ddqSeparator)
-        self.selectionStyle = UITableViewCell.SelectionStyle.none
+        ddqIsInitialize = true
+        contentView.addSubview(ddqSeparator)
+        selectionStyle = UITableViewCell.SelectionStyle.none
         
-        self.ddqSeparator.backgroundColor = self.ddqSeparatorColor
-        self.contentView.backgroundColor = .ddqBackgroundColor()
+        ddqSeparator.backgroundColor = ddqSeparatorColor
+        contentView.backgroundColor = .ddqBackgroundColor()
     }
     
     open func ddqCellLayoutSubviews(size: CGSize) {
-        self.ddqIsLayoutSubviews = true
+        ddqIsLayoutSubviews = true
     }
         
     open func ddqCellSetNeedsLayout() {
-        if self.ddqIsLayoutSubviews {
-            self.setNeedsLayout()
+        if ddqIsLayoutSubviews {
+            setNeedsLayout()
         }
     }
     
@@ -99,19 +97,19 @@ open class DDQCell: UITableViewCell {
     public override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        self.ddqCellInitialize()
+        ddqCellInitialize()
     }
     
     required public init?(coder: NSCoder) {
         
         super.init(coder: coder)
-        self.ddqCellInitialize()
+        ddqCellInitialize()
     }
     
     open override var frame: CGRect {
         didSet {
-            if self.ddqCellLayoutSubviewsWhenSetFrame() {
-                self.ddqCellLayoutSubviews(size: frame.size)
+            if ddqCellLayoutSubviewsWhenSetFrame() {
+                ddqCellLayoutSubviews(size: frame.size)
             }
         }
     }
@@ -119,7 +117,7 @@ open class DDQCell: UITableViewCell {
     open override func awakeFromNib() {
         
         super.awakeFromNib()
-        self.ddqCellInitialize()
+        ddqCellInitialize()
     }
     
     open override class var requiresConstraintBasedLayout: Bool {
@@ -130,21 +128,21 @@ open class DDQCell: UITableViewCell {
         
         super.layoutSubviews()
                 
-        let width = self.contentView.ddqWidth - self.ddqSeparatorMargin.left - self.ddqSeparatorMargin.right
-        var frame: CGRect = .init(x: self.ddqSeparatorMargin.left, y: 0.0, width: width, height: self.ddqSeparatorHeight)
+        let width = contentView.ddqWidth - ddqSeparatorMargin.left - ddqSeparatorMargin.right
+        var frame: CGRect = .init(x: ddqSeparatorMargin.left, y: 0.0, width: width, height: ddqSeparatorHeight)
         
-        switch self.ddqSeparatorStyle {
+        switch ddqSeparatorStyle {
             case .none:
-                frame = CGRect.zero
+                frame = .zero
                 
             case .bottom:
-                frame.origin.y = self.contentView.ddqHeight - self.ddqSeparatorHeight
+                frame.origin.y = contentView.ddqHeight - ddqSeparatorHeight
                 
             case .top:
                 frame.origin.y = 0.0
         }
         
-        self.ddqSeparator.frame = frame
-        self.ddqCellLayoutSubviews(size: self.contentView.ddqSize)
+        ddqSeparator.frame = frame
+        ddqCellLayoutSubviews(size: size)
     }
 }

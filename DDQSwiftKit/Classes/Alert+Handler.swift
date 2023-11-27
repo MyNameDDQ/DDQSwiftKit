@@ -33,7 +33,7 @@ public extension UIViewController {
         }
         
         if ready(alert) {
-            self.present(alert, animated: true, completion: nil)
+            present(alert, animated: true, completion: nil)
         }
     }
     
@@ -62,6 +62,6 @@ public extension UIViewController {
             actions.append(cancelAction)
         }
         
-        self.ddqAlert(style: style, title: title, message: message, actions: actions, autoAlert: autoAlert)
+        ddqAlert(style: style, title: title, message: message, actions: actions, autoAlert: autoAlert)
     }
 }

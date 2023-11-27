@@ -16,37 +16,37 @@ open class DDQCollectionViewCell: UICollectionViewCell {
     }
     
     open func ddqItemSetNeedLayout() {
-        if self.ddqIsLayoutSubviews {
-            self.setNeedsLayout()
+        if ddqIsLayoutSubviews {
+            setNeedsLayout()
         }
     }
 
     open func ddqItemLayoutSubviews(size: CGSize) {
-        self.ddqIsLayoutSubviews = true
+        ddqIsLayoutSubviews = true
     }
 
     open func ddqItemInitialize() {
         
-        self.ddqIsInitialize = true
-        self.contentView.backgroundColor = .ddqBackgroundColor()
+        ddqIsInitialize = true
+        contentView.backgroundColor = .ddqBackgroundColor()
     }
     
     public override init(frame: CGRect) {
                 
         super.init(frame: frame)
-        self.ddqItemInitialize()
+        ddqItemInitialize()
     }
     
     required public init?(coder: NSCoder) {
         
         super.init(coder: coder)
-        self.ddqItemInitialize()
+        ddqItemInitialize()
     }
     
     open override var frame: CGRect {
         didSet {
-            if self.ddqItemLayoutSubviewsWhenSetFrame() {
-                self.ddqItemLayoutSubviews(size: frame.size)
+            if ddqItemLayoutSubviewsWhenSetFrame() {
+                ddqItemLayoutSubviews(size: frame.size)
             }
         }
     }
@@ -54,7 +54,7 @@ open class DDQCollectionViewCell: UICollectionViewCell {
     open override func awakeFromNib() {
         
         super.awakeFromNib()
-        self.ddqItemInitialize()
+        ddqItemInitialize()
     }
     
     open override class var requiresConstraintBasedLayout: Bool {
@@ -64,6 +64,6 @@ open class DDQCollectionViewCell: UICollectionViewCell {
     open override func layoutSubviews() {
         
         super.layoutSubviews()
-        self.ddqItemLayoutSubviews(size: self.contentView.ddqSize)
+        ddqItemLayoutSubviews(size: contentView.ddqSize)
     }
 }

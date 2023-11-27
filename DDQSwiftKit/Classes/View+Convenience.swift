@@ -8,11 +8,11 @@
 import UIKit
 
 public var ddqScreenWidth: CGFloat {
-    UIScreen.main.bounds.width
+    ddqScreen.bounds.width
 }
 
 public var ddqScreenHeight: CGFloat {
-    UIScreen.main.bounds.height
+    ddqScreen.bounds.height
 }
 
 public var ddqKeyWindow: UIWindow? {
@@ -21,6 +21,14 @@ public var ddqKeyWindow: UIWindow? {
 
 public var ddqRootViewController: UIViewController? {
     ddqKeyWindow?.rootViewController
+}
+
+public var ddqDevice: UIDevice {
+    .current
+}
+
+public var ddqScreen: UIScreen {
+    .main
 }
 
 @available(iOS 13.0, *)
@@ -39,61 +47,61 @@ public var ddqIsLightStyle: Bool {
 extension UITraitCollection {
     @available(iOS 13.0, *)
     var ddqIsLightStyle: Bool {
-        self.userInterfaceStyle != .dark
+        userInterfaceStyle != .dark
     }
 }
 
 public extension UIView {
     var ddqX: CGFloat {
-        self.frame.minX
+        frame.minX
     }
     
     var ddqY: CGFloat {
-        self.frame.minY
+        frame.minY
     }
 
     var ddqWidth: CGFloat {
-        self.bounds.width
+        bounds.width
     }
     
     var ddqHeight: CGFloat {
-        self.bounds.height
+        bounds.height
     }
 
     var ddqMaxY: CGFloat {
-        self.frame.maxY
+        frame.maxY
     }
     
     var ddqMaxX: CGFloat {
-        self.frame.maxX
+        frame.maxX
     }
     
     var ddqMidY: CGFloat {
-        self.frame.midY
+        frame.midY
     }
     
     var ddqMidX: CGFloat {
-        self.frame.midX
+        frame.midX
     }
     
     var ddqBoundsMaxY: CGFloat {
-        self.bounds.maxY
+        bounds.maxY
     }
     
     var ddqBoundsMaxX: CGFloat {
-        self.bounds.maxX
+        bounds.maxX
     }
     
     var ddqBoundsMidY: CGFloat {
-        self.bounds.midY
+        bounds.midY
     }
     
     var ddqBoundsMidX: CGFloat {
-        self.bounds.midX
+        bounds.midX
     }
     
     var ddqSize: CGSize {
-        self.bounds.size
+        bounds.size
     }
             
     var ddqLayoutSafeInsets: UIEdgeInsets {
@@ -102,7 +110,7 @@ public extension UIView {
         let keyWindow = ddqKeyWindow
         
         if #available(iOS 11.0, *) {
-            insets = self.safeAreaInsets
+            insets = safeAreaInsets
         } else {
             
             insets.top = keyWindow?.rootViewController?.topLayoutGuide.length ?? 0.0
@@ -116,55 +124,92 @@ public extension UIView {
 public extension UIView {
     func ddqSetOrigin(_ origin: CGPoint) {
         
-        var frame = self.frame
+        var frame = frame
         frame.origin = origin
         self.frame = frame
     }
     
     func ddqSetX(_ x: CGFloat) {
-        self.ddqSetOrigin(CGPoint(x: x, y: self.ddqY))
+        ddqSetOrigin(CGPoint(x: x, y: ddqY))
     }
     
     func ddqSetY(_ y: CGFloat) {
-        self.ddqSetOrigin(CGPoint(x: self.ddqX, y: y))
+        ddqSetOrigin(CGPoint(x: ddqX, y: y))
     }
     
     func ddqSetSize(_ size: CGSize) {
         
-        var frame = self.frame
+        var frame = frame
         frame.size = size
         self.frame = frame
     }
     
     func ddqSetWidth(_ width: CGFloat) {
-        self.ddqSetSize(CGSize(width: width, height: self.ddqHeight))
+        ddqSetSize(CGSize(width: width, height: ddqHeight))
     }
     
     func ddqSetHeight(_ height: CGFloat) {
-        self.ddqSetSize(CGSize(width: self.ddqWidth, height: height))
+        ddqSetSize(CGSize(width: ddqWidth, height: height))
     }
     
     func ddqSetLayer(radius: CGFloat? = nil, width: CGFloat? = nil, color: UIColor? = nil) {
         if let r = radius {
-            self.layer.cornerRadius = r
+            layer.cornerRadius = r
         }
         
         if let w = width {
-            self.layer.borderWidth = w
+            layer.borderWidth = w
         }
         
         if let c = color {
-            self.layer.borderColor = c.cgColor
+            layer.borderColor = c.cgColor
         }
     }
     
     func ddqSetBezierLayer(corners: UIRectCorner = .allCorners, radii: CGSize = .init(width: 5.0, height: 5.0)) {
         
         let layer = CAShapeLayer()
-        let path = UIBezierPath(roundedRect: self.bounds, byRoundingCorners: corners, cornerRadii: radii)
+        let path = UIBezierPath(roundedRect: bounds, byRoundingCorners: corners, cornerRadii: radii)
         layer.path = path.cgPath
         layer.frame = path.bounds
         path.close()
-        self.layer.mask = layer
+        layer.mask = layer
+    }
+}
+
+public extension CGPoint {
+    static func +(lhs: CGPoint, rhs: CGPoint) -> CGPoint {
+        .init(x: lhs.x + rhs.x, y: lhs.y + rhs.y)
+    }
+    
+    static func -(lhs: CGPoint, rhs: CGPoint) -> CGPoint {
+        .init(x: lhs.x - rhs.x, y: lhs.y - rhs.y)
+    }
+
+    
+    static func *(_ p: CGPoint, scale: (x: CGFloat, y: CGFloat)) -> CGPoint {
+        .init(x: p.x * scale.x, y: p.y * scale.y)
+    }
+
+    static func /(_ p: CGPoint, scale: (x: CGFloat, y: CGFloat)) -> CGPoint {
+        .init(x: p.x / scale.x, y: p.y / scale.y)
+    }
+}
+
+public extension CGSize {
+    static func +(lhs: CGSize, rhs: CGSize) -> CGSize {
+        .init(width: lhs.width + rhs.width, height: lhs.height + rhs.height)
+    }
+    
+    static func -(lhs: CGSize, rhs: CGSize) -> CGSize {
+        .init(width: lhs.width - rhs.width, height: lhs.height - rhs.height)
+    }
+
+    static func *(_ s: CGSize, scale: (x: CGFloat, y: CGFloat)) -> CGSize {
+        .init(width: s.width * scale.x, height: s.height * scale.y)
+    }
+
+    static func /(_ s: CGSize, scale: (x: CGFloat, y: CGFloat)) -> CGSize {
+        .init(width: s.width / scale.x, height: s.height / scale.y)
     }
 }

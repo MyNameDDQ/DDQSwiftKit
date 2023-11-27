@@ -20,7 +20,7 @@ public extension UIView {
         }
         
         for view in sub {
-            self.addSubview(view)
+            addSubview(view)
         }
     }
     
@@ -30,14 +30,14 @@ public extension UIView {
         }
 
         for view in sub {
-            if self.subviews.contains(view) {
+            if subviews.contains(view) {
                 view.removeFromSuperview()
             }
         }
     }
     
     func ddqRemoveAllSubViews() {
-        self.ddqRemoveSubViews(subViews: self.subviews)
+        ddqRemoveSubViews(subViews: subviews)
     }
     
     func ddqSubviewsWithClass(vClass: AnyClass?) -> [UIView]? {
@@ -45,7 +45,7 @@ public extension UIView {
             return nil
         }
        
-        let filters = self.subviews.filter { (view) -> Bool in
+        let filters = subviews.filter { (view) -> Bool in
             return type(of: view).isEqual(vClass)
         }
         
@@ -53,7 +53,7 @@ public extension UIView {
     }
     
     func ddqRemoveSubViews(viewClass vClass: AnyClass?) {
-        self.ddqRemoveSubViews(subViews: self.ddqSubviewsWithClass(vClass: vClass))
+        ddqRemoveSubViews(subViews: ddqSubviewsWithClass(vClass: vClass))
     }
     
     func ddqAddTapGestureRecognizer(action: @escaping(UITapGestureRecognizer) -> Void) -> UITapGestureRecognizer {
@@ -62,7 +62,7 @@ public extension UIView {
             action(gr as! UITapGestureRecognizer)
         }
         
-        self.addGestureRecognizer(tap)
+        addGestureRecognizer(tap)
         return tap
     }
 
@@ -72,7 +72,7 @@ public extension UIView {
             action(gr as! UILongPressGestureRecognizer)
         }
         
-        self.addGestureRecognizer(longPress)
+        addGestureRecognizer(longPress)
         return longPress
     }
 
@@ -82,7 +82,7 @@ public extension UIView {
             action(gr as! UISwipeGestureRecognizer)
         }
         
-        self.addGestureRecognizer(swipe)
+        addGestureRecognizer(swipe)
         return swipe
     }
 
@@ -92,7 +92,7 @@ public extension UIView {
             action(gr as! UIPanGestureRecognizer)
         }
         
-        self.addGestureRecognizer(pan)
+        addGestureRecognizer(pan)
         return pan
     }
 }
@@ -112,34 +112,34 @@ public extension UILabel {
     
     func ddqGetSizeToFitHeight() -> CGFloat {
         
-        let fontLineH = self.font.lineHeight
+        let fontLineH = font.lineHeight
         
-        if self.attributedText != nil {
-            if self.numberOfLines == 0 {
+        if attributedText != nil {
+            if numberOfLines == 0 {
                 return CGFloat.greatestFiniteMagnitude
             }
 
             var lineSpacing: CGFloat = 0.0
             
-            if let attributes = self.attributedText?.attributes {
+            if let attributes = attributedText?.attributes {
                 if let paragraph = attributes[NSAttributedString.Key.paragraphStyle.rawValue] as? NSParagraphStyle {
                     lineSpacing = paragraph.lineSpacing
                 }
             }
             
-            return fontLineH * self.numberOfLines.ddqToCGFloat() + (self.numberOfLines - 1).ddqToCGFloat() * lineSpacing
+            return fontLineH * numberOfLines.ddqToCGFloat() + (numberOfLines - 1).ddqToCGFloat() * lineSpacing
         }
         
-        if self.numberOfLines == 0 {
+        if numberOfLines == 0 {
             return .greatestFiniteMagnitude
         }
         
-        return fontLineH * self.numberOfLines.ddqToCGFloat()
+        return fontLineH * numberOfLines.ddqToCGFloat()
     }
     
     func ddqLabelSizeThatBounding(options: NSStringDrawingOptions = .usesLineFragmentOrigin, size: CGSize) -> CGSize {
-        guard let attributd = self.attributedText else {
-            return self.text?.boundingRect(with: size, options: options, attributes: nil, context: nil).size ?? CGSize.zero
+        guard let attributd = attributedText else {
+            return text?.boundingRect(with: size, options: options, attributes: nil, context: nil).size ?? CGSize.zero
         }
         
         return attributd.boundingRect(with: size, options: options, context: nil).size
@@ -153,20 +153,20 @@ public extension UIButton {
     func ddqSet(title: String? = nil, titleState: UIControl.State = .normal, image: UIImage? = nil, imageState: UIControl.State = .normal, backgroundImage: UIImage? = nil, backgroundState: UIControl.State = .normal, event: UIButton.Event = .touchUpInside, action: DDQButtonActionBlock? = nil) {
         
         if let t = title {
-            self.setTitle(t, for: titleState)
+            setTitle(t, for: titleState)
         }
         
         if let i = image {
-            self.setImage(i, for: imageState)
+            setImage(i, for: imageState)
         }
 
         if let b = backgroundImage {
-            self.setBackgroundImage(b, for: backgroundState)
+            setBackgroundImage(b, for: backgroundState)
         }
 
         if action != nil {
             
-            self.addBlock(for: event) { (button) in
+            addBlock(for: event) { (button) in
                 action!(button as! UIButton)
             }
         }
@@ -174,12 +174,12 @@ public extension UIButton {
     
     func ddqSet(title: String? = nil, titleState: UIControl.State = .normal, image: UIImage? = nil, imageState: UIControl.State = .normal, backgroundImage: UIImage? = nil, backgroundState: UIControl.State = .normal, event: UIButton.Event = .touchUpInside, target: Any, selector: Selector) {
         
-        self.ddqSet(title: title, titleState: titleState, image: image, imageState: imageState, backgroundImage: backgroundImage, backgroundState: backgroundState)
-        self.addTarget(target, action: selector, for: event)
+        ddqSet(title: title, titleState: titleState, image: image, imageState: imageState, backgroundImage: backgroundImage, backgroundState: backgroundState)
+        addTarget(target, action: selector, for: event)
     }
     
     func ddqSetWebImage(url: String?, state: UIControl.State = .normal, completed: SDExternalCompletionBlock? = nil) {
-        self.sd_setImage(with: URL(string: url ?? ""), for: state, completed: completed)
+        sd_setImage(with: URL(string: url ?? ""), for: state, completed: completed)
     }
 }
 
@@ -203,7 +203,7 @@ public extension UIImage {
     func ddqScaleImageToSize(_ size: CGSize) -> UIImage? {
 
         UIGraphicsBeginImageContextWithOptions(size, false, UIScreen.main.scale)
-        self.draw(in: CGRect.init(origin: CGPoint.zero, size: size))
+        draw(in: CGRect.init(origin: CGPoint.zero, size: size))
         let image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         return image
@@ -239,7 +239,7 @@ public extension UIImage {
     }
     
     func ddqScaleImageToQuality(_ q: CGFloat) -> UIImage? {
-        if let imageData: Data = self.sd_imageData(as: .JPEG, compressionQuality: q.ddqToDouble()) {
+        if let imageData: Data = sd_imageData(as: .JPEG, compressionQuality: q.ddqToDouble()) {
             return UIImage.init(data: imageData, scale: UIScreen.main.scale)
         }
         
@@ -247,7 +247,7 @@ public extension UIImage {
     }
     
     func ddqToBase64String() -> String? {
-        if let imageData = self.sd_imageData() {
+        if let imageData = sd_imageData() {
             return imageData.base64EncodedString()
         }
         
@@ -297,7 +297,7 @@ public extension UIImage {
 public extension UIImageView {
     func ddqSetRendering(rendering: UIImage.RenderingMode) {
         
-        let image = self.image?.withRenderingMode(rendering)
+        let image = image?.withRenderingMode(rendering)
         self.image = image
     }
     
@@ -309,7 +309,7 @@ public extension UIImageView {
             image = .ddqImage(imageName: placeholderName)
         }
         
-        self.sd_setImage(with: URL(string: url), placeholderImage: image, completed: completed)
+        sd_setImage(with: URL(string: url), placeholderImage: image, completed: completed)
     }
 }
 
@@ -366,7 +366,7 @@ public extension UIScrollView {
                 }
             }
             
-            self.mj_header = headerC
+            mj_header = headerC
         }
         
         if footer != .none {
@@ -408,34 +408,71 @@ public extension UIScrollView {
                 }
             }
             
-            self.mj_footer = footerC
+            mj_footer = footerC
         }
     }
     
-    func ddqEndRefresh(notMore: Bool) {
-        if self.mj_header?.isRefreshing == true {
+    func ddqEndRefresh(_ noMoreData: Bool = false) {
+        if mj_header?.isRefreshing == true {
             
-            self.mj_header?.endRefreshing()
+            mj_header?.endRefreshing()
             
-            if self.mj_footer != nil {
-                self.mj_footer?.resetNoMoreData()
+            if mj_footer != nil {
+                mj_footer?.resetNoMoreData()
             }
         }
         
-        if self.mj_footer?.isRefreshing == true {
-            self.mj_footer?.endRefreshing()
+        if mj_footer?.isRefreshing == true {
+            mj_footer?.endRefreshing()
         }
         
-        if notMore {
-            self.mj_footer?.endRefreshingWithNoMoreData()
+        if noMoreData {
+            mj_footer?.endRefreshingWithNoMoreData()
         }
+    }
+    
+    var ddqIsRefreshing: Bool {
+        if mj_footer?.isRefreshing == true {
+            return true
+        }
+        
+        if mj_header?.isRefreshing == true {
+            return true
+        }
+        
+        return false
     }
     
     func ddqRemoveHeaderFooter() {
         
-        self.mj_header?.endRefreshing()
-        self.mj_header = nil
-        self.mj_footer?.endRefreshing()
-        self.mj_footer = nil
+        mj_header?.endRefreshing()
+        mj_header = nil
+        mj_footer?.endRefreshing()
+        mj_footer = nil
     }
+}
+
+public extension UIView {
+    
+    typealias DDQAnimations = (_ target: UIView) -> Void
+        
+    func ddqAnimated(duration: TimeInterval = .animationInterval, delay: TimeInterval = 0.0, options: AnimationOptions = .curveEaseInOut, _ animations: DDQAnimations?, completion: ((Bool) -> Void)? = nil) {
+        if let c = animations {
+            UIView.animate(withDuration: duration, delay: delay, options: options, animations: {
+                c(self)
+            }, completion: completion)
+        }
+    }
+    
+    static func ddqAnimated(duration: TimeInterval = .animationInterval, delay: TimeInterval = 0.0, options: AnimationOptions = .curveEaseInOut, _ animations: (() -> Void)?, completion: ((Bool) -> Void)? = nil) {
+        if let c = animations {
+            animate(withDuration: duration, delay: delay, options: options, animations: {
+                c()
+            }, completion: completion)
+        }
+    }
+}
+
+public extension TimeInterval {
+    static var animationInterval: TimeInterval { 0.25 }
 }

@@ -8,7 +8,7 @@
 import UIKit
 
 // 适用于双文字展示
-open class DDQTextView: DDQBasalLayoutView {
+open class DDQTextView: DDQLayoutView {
     
     open private(set) var titleLabel: UILabel = .ddqLabel()
     open private(set) var subTitleLabel: UILabel = .ddqLabel()
@@ -16,16 +16,16 @@ open class DDQTextView: DDQBasalLayoutView {
     public convenience init(title: String? = nil, subTitle: String? = nil) {
         
         self.init(frame: CGRect.zero)
-        self.titleLabel.text = title
-        self.subTitleLabel.text = subTitle
+        titleLabel.text = title
+        subTitleLabel.text = subTitle
     }
         
     open override func ddqViewInitialize() {
         
         super.ddqViewInitialize()
-        self.ddqAddSubViews(subViews: [self.titleLabel, self.subTitleLabel])
+        ddqAddSubViews(subViews: [titleLabel, subTitleLabel])
         
-        self.mainView = self.titleLabel
-        self.subView = self.subTitleLabel
+        mainView = titleLabel
+        subView = subTitleLabel
     }
 }
