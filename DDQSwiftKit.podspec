@@ -8,22 +8,24 @@
 
 Pod::Spec.new do |s|
   s.name             = 'DDQSwiftKit'
-  s.version          = '1.0.2'
+  s.version          = '1.0.3'
   s.summary          = 'DDQKit swift version.'
-  s.platform         = :ios, '9.0'
   s.swift_version = '5.0'
-  s.ios.deployment_target = '9.0'
+  s.ios.deployment_target = '12.0'
   s.homepage         = 'https://github.com/MyNameDDQ/DDQSwiftKit.git'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'MyNameDDQ' => '869795924@qq.com' }
   s.source           = { :git => 'https://github.com/MyNameDDQ/DDQSwiftKit.git', :tag => s.version.to_s }
   s.source_files = 'DDQSwiftKit/Classes/**/*'
   s.requires_arc = true
-  s.pod_target_xcconfig = { 'VALID_ARCHS' => 'arm64 armv7 x86_64' }
+  s.pod_target_xcconfig = { 
+    :VALID_ARCHS => 'arm64 armv7 x86_64',
+    :IPHONEOS_DEPLOYMENT_TARGET => 11.0
+  }
 
   s.dependency 'SwiftyJSON'
   s.dependency 'HandyJSON'
-  s.dependency 'IQKeyboardManagerSwift'
+  s.dependency 'IQKeyboardManager'
   s.dependency 'SwiftLint'
   s.dependency 'YYKit'
   s.dependency 'MBProgressHUD'
@@ -36,4 +38,5 @@ Pod::Spec.new do |s|
   s.dependency 'SwiftGen'
   s.dependency 'Kingfisher'
   s.dependency 'Alamofire'
+
 end
